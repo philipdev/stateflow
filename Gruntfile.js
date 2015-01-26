@@ -39,6 +39,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadNpmTasks('grunt-graphviz');
     grunt.loadNpmTasks("grunt-jsdoc-to-markdown");
+    grunt.loadNpmTasks('grunt-contrib-concat');
     
     grunt.initConfig({
         jshint: {
@@ -53,9 +54,15 @@ module.exports = function (grunt) {
         jsdoc2md: {
             oneOutputFile: {
                 src: "lib/*.js",
-                dest: "README.md"
+                dest: "jsdoc.md"
             }
-        },    
+        }, 
+        concat: {
+            dist: {
+              src: ['usage.md','jsdoc.md'],
+              dest: 'README.md',
+            },
+        },        
         mochaTest: {
             test: {
                 options: {
@@ -79,8 +86,8 @@ module.exports = function (grunt) {
             }
         }
     });
-
-    grunt.registerTask('default', ['jshint', 'mochaTest', 'jsdoc']);
+    grunt.registerTask('doc', ['jsdoc', 'jsdoc2md', 'concat']);
+    grunt.registerTask('default', ['jshint', 'mochaTest', 'doc']);
     grunt.registerTask('dot', function () { // still need to include then into the documentation
         var files = fs.readdirSync('test/flows');
         files.forEach(function (file) {
