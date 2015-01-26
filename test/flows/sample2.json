@@ -1,0 +1,13 @@
+{
+	"begin-state" : {
+		"type": "begin",
+		"action": "beginAction",
+		"on": {
+			"next": "end-state"
+		}
+	},
+	"end-state" : {
+		"type": "end",
+		"action": "endAction"
+	}
+}

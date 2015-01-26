@@ -1,0 +1,32 @@
+{
+	"begin" : {
+		"action" : "start",
+		"type": "begin",
+		"on" : {
+			"next": "embeddedChild"
+		}	
+	},
+	"embeddedChild": {
+		"type":"end",
+		"action": {
+			"step1" : {
+				"type":"begin",
+				"action":"someAction",
+				"on" : {
+					"ok":"step2"
+				}
+			},
+			"step2": {
+					
+				"action":"someAction",
+				"on": {
+					"ok":"step3"
+				}
+			},
+			"step3": {
+				"type":"end",
+				"action":"someAction"
+			}
+		}
+	}
+}

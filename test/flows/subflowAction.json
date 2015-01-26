@@ -1,0 +1,20 @@
+{
+	"begin" : {
+		"action" : "ok",
+		"type": "begin",
+		"on" : {
+			"ok": "subflow"
+		}	
+	},
+	"subflow": {
+		"action": "subflow",
+		"on" : {
+			"ok":"end"
+		}
+	},
+	"end": {
+		"type":"end",
+		"action":"ok"		
+	}
+	
+}

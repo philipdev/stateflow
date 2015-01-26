@@ -1,0 +1,17 @@
+{
+  "name": "stateflow",
+  "version": "0.1.0",
+  "description": "async state flow engine",
+  "main": "./lib/stateflow.js",
+  "private": false,
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-watch": "*",
+    "grunt-graphviz": "^0.1.1",
+    "grunt-jsdoc": "*",
+    "grunt-jslint": "*",
+    "grunt-mocha-test": "*",
+    "mocha": "^2.1.0"
+  }
+}
