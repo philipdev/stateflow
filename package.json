@@ -5,11 +5,12 @@
   "main": "./lib/stateflow.js",
   "private": false,
   "devDependencies": {
-    "grunt": "*",
+    "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-watch": "*",
     "grunt-graphviz": "^0.1.1",
     "grunt-jsdoc": "*",
+    "grunt-jsdoc-to-markdown": "^0.4.2",
     "grunt-jslint": "*",
     "grunt-mocha-test": "*",
     "mocha": "^2.1.0"

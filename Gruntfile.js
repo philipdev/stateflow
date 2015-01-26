@@ -38,7 +38,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadNpmTasks('grunt-graphviz');
-
+    grunt.loadNpmTasks("grunt-jsdoc-to-markdown");
+    
     grunt.initConfig({
         jshint: {
             all: ['lib/*.js', 'test/*.js', 'Gruntfile.js']
@@ -49,6 +50,12 @@ module.exports = function (grunt) {
                 dest: 'out'
             }
         },
+        jsdoc2md: {
+            oneOutputFile: {
+                src: "lib/*.js",
+                dest: "README.md"
+            }
+        },    
         mochaTest: {
             test: {
                 options: {
