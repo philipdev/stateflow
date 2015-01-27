@@ -69,14 +69,7 @@ flow.start( function completionCallback(event) {
     * [state.installTimeout(timeout, handler)](#module_stateflow..State#installTimeout)
   * [class: stateflow~StateFlow](#module_stateflow..StateFlow)
     * [new stateflow~StateFlow(config)](#new_module_stateflow..StateFlow)
-    * [stateFlow.getRegisteredAction()](#module_stateflow..StateFlow#getRegisteredAction)
-    * [stateFlow.getSubFlowConfig(state)](#module_stateflow..StateFlow#getSubFlowConfig)
-    * [stateFlow.isSubFlowState()](#module_stateflow..StateFlow#isSubFlowState)
-    * [stateFlow.getAction(state)](#module_stateflow..StateFlow#getAction)
-    * [stateFlow.createSubFlowAction()](#module_stateflow..StateFlow#createSubFlowAction)
     * [stateFlow.start(complete)](#module_stateflow..StateFlow#start)
-    * [stateFlow.go(state, complete)](#module_stateflow..StateFlow#go)
-    * [stateFlow.createStateHandler(state, stateObj, flowCompleted)](#module_stateflow..StateFlow#createStateHandler)
     * [stateFlow.getStateObject(the)](#module_stateflow..StateFlow#getStateObject)
 
 **Typedefs**
@@ -100,14 +93,7 @@ flow.start( function completionCallback(event) {
     * [state.installTimeout(timeout, handler)](#module_stateflow..State#installTimeout)
   * [class: stateflow~StateFlow](#module_stateflow..StateFlow)
     * [new stateflow~StateFlow(config)](#new_module_stateflow..StateFlow)
-    * [stateFlow.getRegisteredAction()](#module_stateflow..StateFlow#getRegisteredAction)
-    * [stateFlow.getSubFlowConfig(state)](#module_stateflow..StateFlow#getSubFlowConfig)
-    * [stateFlow.isSubFlowState()](#module_stateflow..StateFlow#isSubFlowState)
-    * [stateFlow.getAction(state)](#module_stateflow..StateFlow#getAction)
-    * [stateFlow.createSubFlowAction()](#module_stateflow..StateFlow#createSubFlowAction)
     * [stateFlow.start(complete)](#module_stateflow..StateFlow#start)
-    * [stateFlow.go(state, complete)](#module_stateflow..StateFlow#go)
-    * [stateFlow.createStateHandler(state, stateObj, flowCompleted)](#module_stateflow..StateFlow#createStateHandler)
     * [stateFlow.getStateObject(the)](#module_stateflow..StateFlow#getStateObject)
 
 <a name="module_stateflow..action"></a>
@@ -206,14 +192,7 @@ Install a state timeout handler, an active timeout is automatically cancelled be
 
 * [class: stateflow~StateFlow](#module_stateflow..StateFlow)
   * [new stateflow~StateFlow(config)](#new_module_stateflow..StateFlow)
-  * [stateFlow.getRegisteredAction()](#module_stateflow..StateFlow#getRegisteredAction)
-  * [stateFlow.getSubFlowConfig(state)](#module_stateflow..StateFlow#getSubFlowConfig)
-  * [stateFlow.isSubFlowState()](#module_stateflow..StateFlow#isSubFlowState)
-  * [stateFlow.getAction(state)](#module_stateflow..StateFlow#getAction)
-  * [stateFlow.createSubFlowAction()](#module_stateflow..StateFlow#createSubFlowAction)
   * [stateFlow.start(complete)](#module_stateflow..StateFlow#start)
-  * [stateFlow.go(state, complete)](#module_stateflow..StateFlow#go)
-  * [stateFlow.createStateHandler(state, stateObj, flowCompleted)](#module_stateflow..StateFlow#createStateHandler)
   * [stateFlow.getStateObject(the)](#module_stateflow..StateFlow#getStateObject)
 
 <a name="new_module_stateflow..StateFlow"></a>
@@ -231,35 +210,6 @@ StateFlow is an async event state machine, using js object notation.<br/>Each p
 
 **Extends**: `State`  
 **Scope**: inner class of [stateflow](#module_stateflow)  
-<a name="module_stateflow..StateFlow#getRegisteredAction"></a>
-###stateFlow.getRegisteredAction()
-Get registered action from the current flow, travel the parent chain until the named action is found (action's registered in the parent flow are also available in the subflow).
-
-**Returns**: `string` | `object` | `function` - literal registered action  
-<a name="module_stateflow..StateFlow#getSubFlowConfig"></a>
-###stateFlow.getSubFlowConfig(state)
-**Params**
-
-- state `string` - state name of a subflow  
-
-**Returns**: `object` - flow definition of a subflow.  
-<a name="module_stateflow..StateFlow#isSubFlowState"></a>
-###stateFlow.isSubFlowState()
-Check state action is a subflow or references a subflow.
-
-**Returns**: `Boolean`  
-<a name="module_stateflow..StateFlow#getAction"></a>
-###stateFlow.getAction(state)
-Get state action function
-
-**Params**
-
-- state  - state name to get the action from.  
-
-**Returns**: `action`  
-<a name="module_stateflow..StateFlow#createSubFlowAction"></a>
-###stateFlow.createSubFlowAction()
-**Returns**: `action` - subflow state action  
 <a name="module_stateflow..StateFlow#start"></a>
 ###stateFlow.start(complete)
 Start the flow with the state of type 'begin'
@@ -268,30 +218,6 @@ Start the flow with the state of type 'begin'
 
 - complete `completion` - callback to be called when the end state has been reached.  
 
-<a name="module_stateflow..StateFlow#go"></a>
-###stateFlow.go(state, complete)
-Set the flow in a specific state, this function is still considered internal because abruptly goes to the target state.
-
-**Params**
-
-- state `string` - target state  
-- complete `completion` - the callback to be called when a state of type 'end' is reached, aka when the "flow-state" has been ended.  
-
-**Properties**
-
-- currentState `string` - is set to the given state.  
-
-<a name="module_stateflow..StateFlow#createStateHandler"></a>
-###stateFlow.createStateHandler(state, stateObj, flowCompleted)
-Create a completion function action parameter callback, the callback moves the flow to the next state when an on event matches a completation event.
-
-**Params**
-
-- state `string` - the state where callback is created for  
-- stateObj `object`  
-- flowCompleted `completion` - end of flow callback.  
-
-**Returns**: `completion` - complete  
 <a name="module_stateflow..StateFlow#getStateObject"></a>
 ###stateFlow.getStateObject(the)
 Get the state instance object, which is associated with the state action this.Used to provide functionallity and data state see {State}.For every state there is state object.
