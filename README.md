@@ -70,7 +70,7 @@ flow.start( function completionCallback(event) {
   * [class: stateflow~StateFlow](#module_stateflow..StateFlow)
     * [new stateflow~StateFlow(config)](#new_module_stateflow..StateFlow)
     * [stateFlow.start(complete)](#module_stateflow..StateFlow#start)
-    * [stateFlow.getStateObject(the)](#module_stateflow..StateFlow#getStateObject)
+    * [stateFlow.getStateObject(state)](#module_stateflow..StateFlow#getStateObject)
 
 **Typedefs**
 
@@ -94,7 +94,7 @@ flow.start( function completionCallback(event) {
   * [class: stateflow~StateFlow](#module_stateflow..StateFlow)
     * [new stateflow~StateFlow(config)](#new_module_stateflow..StateFlow)
     * [stateFlow.start(complete)](#module_stateflow..StateFlow#start)
-    * [stateFlow.getStateObject(the)](#module_stateflow..StateFlow#getStateObject)
+    * [stateFlow.getStateObject(state)](#module_stateflow..StateFlow#getStateObject)
 
 <a name="module_stateflow..action"></a>
 ##callback: stateflow~action
@@ -193,7 +193,7 @@ Install a state timeout handler, an active timeout is automatically cancelled be
 * [class: stateflow~StateFlow](#module_stateflow..StateFlow)
   * [new stateflow~StateFlow(config)](#new_module_stateflow..StateFlow)
   * [stateFlow.start(complete)](#module_stateflow..StateFlow#start)
-  * [stateFlow.getStateObject(the)](#module_stateflow..StateFlow#getStateObject)
+  * [stateFlow.getStateObject(state)](#module_stateflow..StateFlow#getStateObject)
 
 <a name="new_module_stateflow..StateFlow"></a>
 ###new stateflow~StateFlow(config)
@@ -219,14 +219,14 @@ Start the flow with the state of type 'begin'
 - complete `completion` - callback to be called when the end state has been reached.  
 
 <a name="module_stateflow..StateFlow#getStateObject"></a>
-###stateFlow.getStateObject(the)
+###stateFlow.getStateObject(state)
 Get the state instance object, which is associated with the state action this.Used to provide functionallity and data state see {State}.For every state there is state object.
 
 **Params**
 
-- the `string` - state name to get an state object for  
+- state `string` - state name to get an state object for  
 
-**Returns**: `State` - the state object  
+**Returns**: `State` - state instance object  
 <a name="stateDefinition"></a>
 #type: stateDefinition
 **Properties**
