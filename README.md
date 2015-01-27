@@ -112,7 +112,7 @@ flow.start( function completionCallback(event) {
 
 <a name="module_stateflow..action"></a>
 ##callback: stateflow~action
-State activation action, can be defined as function, by name (string) or by sub flow definition (object).<br/>If it was defined by name in the state definition then the must be been registered previously with registerAction().<br/>If defined by flow definition then start and end of the flow will be mapped to the state.
+State activation action, can be defined as function, by name (string) or by subflow definition (object).<br/>If it was defined by name in the state definition then the must be been registered previously with registerAction().<br/>If defined by flow definition then start and end of the flow will be mapped to the state.
 
 **Params**
 
@@ -174,30 +174,30 @@ Set a property
 **Params**
 
 - name `string`  
-- obj `object` | `function` - object or getter function which will be executed on `State#get`  
+- obj `object` | `function` - object or getter function executed on `State#get`  
 
 <a name="module_stateflow..State#listenTo"></a>
 ###state.listenTo(objectOrName, event, listener)
-Listen to a service event while the state is active.All events registered with 'listenTo' while be automatically removed when the state exits. if the listener is a string then it's considered a state completion event.
+Listen to a service event while this state is active.All events registered with 'listenTo' are automatically removed when the state exits.
 
 **Params**
 
 - objectOrName `object` | `string` - the service name (string) which was registered with set or event emitter instance (object),  
 - event `string` - the event to listen on  
-- listener `callback` | `string` - event listener or state completion event  
+- listener `callback` | `string` - event listener function or state completion event  
 
 <a name="module_stateflow..State#cancelTimeout"></a>
 ###state.cancelTimeout()
-Cancel the previous installed timeout, note this function is impliciltly called when the state exists, but might be necessary whensub sequenctial async calls must be called after operation was complete which should not be influenced by a timeout.
+Cancel the previous installed timeout, always executed when state exits.Can be used within a state action.
 
 <a name="module_stateflow..State#installTimeout"></a>
 ###state.installTimeout(timeout, handler)
-Install a state timeout handler.
+Install a state timeout handler, an active timeout is automatically cancelled before going to the next state.
 
 **Params**
 
-- timeout `integer` - the timeout in ms  
-- handler `callback` | `string` - the function or completion event (string) to be called when the timeout expires or the completion event to be fired when timeout expires.  
+- timeout `integer` - timeout in milliseconds  
+- handler `callback` | `string` - function or completion event (string).  
 
 <a name="module_stateflow..StateFlow"></a>
 ##class: stateflow~StateFlow
@@ -218,7 +218,7 @@ Install a state timeout handler.
 
 <a name="new_module_stateflow..StateFlow"></a>
 ###new stateflow~StateFlow(config)
-StateFlow is an async event state machine, defined with an js object where the property is the state and the value the state definition.<br/><pre>Usage:var flow = new StateFlow({     beginState: {         type: 'begin',         action: function (complete) {             complete('anEvent');         },         on: {             anEvent:'nextState'         }     },     nextState: {         type: 'end',         action: function (complete) {             complete('done');          }      }});flow.start(function (event) {    if(event !== 'done') throw new Error('event must be done, as in nextState');});</pre>
+StateFlow is an async event state machine, using js object notation.<br/>Each property is a state the value is the state definition, state definition has:<br/> action: function, register action, or subflow definition.<br/> on: a mapping between state completion events and target state<br/> type: 'begin': the initial state of the flow, 'end': the state that terminates the flow after execution the action.<pre>Usage:var flow = new StateFlow({     beginState: {         type: 'begin',         action: function (complete) {             complete('anEvent');         },         on: {             anEvent:'nextState'         }     },     nextState: {         type: 'end',         action: function (complete) {             complete('done');          }      }});flow.start(function (event) {    if(event !== 'done') throw new Error('event must be done, as in nextState');});</pre>
 
 **Params**
 
@@ -233,16 +233,16 @@ StateFlow is an async event state machine, defined with an js object where the p
 **Scope**: inner class of [stateflow](#module_stateflow)  
 <a name="module_stateflow..StateFlow#getRegisteredAction"></a>
 ###stateFlow.getRegisteredAction()
-Get registered action from the current flow, travel the parent chain until the named action is found (aka action's registered in the parent flow are also available in the subflow).
+Get registered action from the current flow, travel the parent chain until the named action is found (action's registered in the parent flow are also available in the subflow).
 
 **Returns**: `string` | `object` | `function` - literal registered action  
 <a name="module_stateflow..StateFlow#getSubFlowConfig"></a>
 ###stateFlow.getSubFlowConfig(state)
 **Params**
 
-- state `string` - the state to get the sub flow  
+- state `string` - state name of a subflow  
 
-**Returns**: `object` - the flow definition of a sub flow.  
+**Returns**: `object` - flow definition of a subflow.  
 <a name="module_stateflow..StateFlow#isSubFlowState"></a>
 ###stateFlow.isSubFlowState()
 Check state action is a subflow or references a subflow.
@@ -270,11 +270,11 @@ Start the flow with the state of type 'begin'
 
 <a name="module_stateflow..StateFlow#go"></a>
 ###stateFlow.go(state, complete)
-Set the flow in a specific state
+Set the flow in a specific state, this function is still considered internal because abruptly goes to the target state.
 
 **Params**
 
-- state `string` - the state to set to  
+- state `string` - target state  
 - complete `completion` - the callback to be called when a state of type 'end' is reached, aka when the "flow-state" has been ended.  
 
 **Properties**
@@ -283,18 +283,18 @@ Set the flow in a specific state
 
 <a name="module_stateflow..StateFlow#createStateHandler"></a>
 ###stateFlow.createStateHandler(state, stateObj, flowCompleted)
-Create a completion function which is used as the callback argument for the <tt>state</tt> action, this callback will move the flow to the next state when a matching event is found.
+Create a completion function action parameter callback, the callback moves the flow to the next state when an on event matches a completation event.
 
 **Params**
 
 - state `string` - the state where callback is created for  
 - stateObj `object`  
-- flowCompleted `completion` - callback to be called when the flow reaches the end state.  
+- flowCompleted `completion` - end of flow callback.  
 
-**Returns**: `completion` - complete  callback to be use by a state action to continue the flow.  
+**Returns**: `completion` - complete  
 <a name="module_stateflow..StateFlow#getStateObject"></a>
 ###stateFlow.getStateObject(the)
-Get the instance object which will be associated with the state action this.Used to provide functionallity and data state see {State}.For every state there is state object.
+Get the state instance object, which is associated with the state action this.Used to provide functionallity and data state see {State}.For every state there is state object.
 
 **Params**
 
@@ -306,7 +306,7 @@ Get the instance object which will be associated with the state action this.Use
 **Properties**
 
 - type `string` - 'begin': initial state on flow start, 'state': normal state (default), 'end': flow terminates when this state  
-- action `action` - executed when the state becomes active, when the action property is a string then it lookup the function the previously registerAction(), when action is an object the flow will create a sub flow which will be started when the state becomes active.  
+- action `action` - executed when the state becomes active, defined a function, action name to use a registered action or subflow object flow defintion.  
 - on `object` - key is state completion event value is the next state to goto.  
 
 <a name="flowDefinition"></a>
