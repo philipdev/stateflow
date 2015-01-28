@@ -2,7 +2,7 @@
 ```
 
 var stateflow = require('stateflow');
-// Create a flow with flow defintion (see jsdoc)
+// Create a flow with flow definition (see jsdoc)
 var flow = new stateflow.StateFlow({
 	'entry-state' : {
 		type:'begin',
