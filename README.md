@@ -233,7 +233,7 @@ Get the state instance object, which is associated with the state action this.U
 
 - type `string` - 'begin': initial state on flow start, 'state': normal state (default), 'end': flow terminates when this state  
 - action `action` - executed when the state becomes active, defined a function, action name to use a registered action or subflow object flow defintion.  
-- on `object` - key is state completion event value is the next state to goto.  
+- on `object` - key is state completion event value is the next state to goto. 'objectName.eventName' is also supported, aka if this.get('objectName') emits eventName then goto the next state .  
 
 <a name="flowDefinition"></a>
 #type: flowDefinition
