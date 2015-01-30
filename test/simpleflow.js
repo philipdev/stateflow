@@ -158,5 +158,36 @@ describe('StateFlow', function () {
             emitter.emit('event');
             emitter.emit('event'); // this must be ignored!
         });
+        
+        it('Forward service events', function (done) {
+            var myFlowDefinition = {
+                beginState: {
+                    type: 'begin',
+                    action: function (complete) {
+                        // does nothing, should this be the default action?
+                    },
+                    on: {
+                        'myService.myEvent':'nextState'
+                    }
+                },
+                nextState: {
+                    type: 'end',
+                    action: function (cb) {
+                        cb('done');
+                    }
+                }
+            };
+
+            var emitter = new EventEmitter();
+            var flow = new StateFlow(myFlowDefinition);
+            flow.set('myService', emitter);
+            flow.start(function (event) {
+                assert.equal('done', event);
+                done();
+            });
+
+            emitter.emit('myEvent');
+            emitter.emit('myEvent'); // this must be ignored!
+        });
     });
 });
