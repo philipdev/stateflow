@@ -18,7 +18,7 @@ var flow = new stateflow.StateFlow({
 	'other-state': {
 		action: function(complete) { // can also be a flow definition (subflow).
 			this.get('myServiceOrData'); // <-- private field or inherented from parent flow
-			this.listenTo('myServiceOrData','event', 'signalEvent'); // <-- event listener which cancelled after completion, can also be a listener function
+			this.listenTo('myServiceOrData','event', 'signalEvent'); // <-- event listener, cancelled after completion, also: listener function
 			this.installTimeout(5000, 'timeout'); // <!-- state timeout which is cancelled after completion, can also be a function
 			
 		},

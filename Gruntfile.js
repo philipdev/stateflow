@@ -82,7 +82,7 @@ module.exports = function (grunt) {
         },
         graphviz: {
             flows: {
-                files: {} // overwritten, because these files will be generated!
+                files: {} // overwritten with generated files!
             }
         }
     });
@@ -98,4 +98,5 @@ module.exports = function (grunt) {
         grunt.config.set('graphviz.flow.files', generateGraphFiles('out/flows'));
     });
     grunt.registerTask('graph', ['dot', 'graphviz']);
+    // TODO: add task to publish to npm and git
 };

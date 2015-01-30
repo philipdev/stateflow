@@ -2,7 +2,7 @@
 ```
 
 var stateflow = require('stateflow');
-// Create a flow with flow defintion (see jsdoc)
+// Create a flow with flow definition (see jsdoc)
 var flow = new stateflow.StateFlow({
 	'entry-state' : {
 		type:'begin',
@@ -18,7 +18,7 @@ var flow = new stateflow.StateFlow({
 	'other-state': {
 		action: function(complete) { // can also be a flow definition (subflow).
 			this.get('myServiceOrData'); // <-- private field or inherented from parent flow
-			this.listenTo('myServiceOrData','event', 'signalEvent'); // <-- event listener which cancelled after completion, can also be a listener function
+			this.listenTo('myServiceOrData','event', 'signalEvent'); // <-- event listener, cancelled after completion, also: listener function
 			this.installTimeout(5000, 'timeout'); // <!-- state timeout which is cancelled after completion, can also be a function
 			
 		},
@@ -178,7 +178,7 @@ Cancel the previous installed timeout, always executed when state exits.Can be 
 
 <a name="module_stateflow..State#installTimeout"></a>
 ###state.installTimeout(timeout, handler)
-Install a state timeout handler, an active timeout is automatically cancelled before going to the next state.
+Install a state timeout handler, an active timeout is automatically cancelled before going to the next state.If handler is omitted then the last handler after cancelTimeout() will be reset also the last timeout time will be reset if omitted and available.
 
 **Params**
 
