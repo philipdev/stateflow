@@ -1,6 +1,6 @@
 {
   "name": "stateflow",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "async state flow engine",
   "main": "./lib/stateflow.js",
   "private": false,
