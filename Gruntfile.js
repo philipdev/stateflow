@@ -28,6 +28,7 @@ function generateDot(input, output) {
         }
     });
     content += '}\n';
+    console.log(output,content);
     fs.writeFileSync(output, content);
 }
 
@@ -59,7 +60,7 @@ module.exports = function (grunt) {
         }, 
         concat: {
             dist: {
-              src: ['usage.md','jsdoc.md'],
+              src: ['intro.md','usage.md','jsdoc.md'],
               dest: 'README.md',
             },
         },        

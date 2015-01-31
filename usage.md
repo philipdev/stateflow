@@ -1,6 +1,6 @@
-#Usage
-```
+# Usage
 
+```
 var stateflow = require('stateflow');
 // Create a flow with flow definition (see jsdoc)
 var flow = new stateflow.StateFlow({
@@ -18,9 +18,8 @@ var flow = new stateflow.StateFlow({
 	'other-state': {
 		action: function(complete) { // can also be a flow definition (subflow).
 			this.get('myServiceOrData'); // <-- private field or inherented from parent flow
-			this.listenTo('myServiceOrData','event', 'signalEvent'); // <-- event listener, cancelled after completion, also: listener function
-			this.installTimeout(5000, 'timeout'); // <!-- state timeout which is cancelled after completion, can also be a function
-			
+			this.listenTo('myServiceOrData','event', 'signalEvent'); // <-- event listener, cancelled on exit
+			this.installTimeout(5000, 'timeout'); // <!-- state timeout, cancelled on state exit
 		},
 		on: {
 			'timeout':'exit-state',
@@ -41,13 +40,10 @@ var flow = new stateflow.StateFlow({
 		}
 	}
 });
-
 flow.set('myServiceOrData', emitter);
-
 flow.registerAction('myAction', function(complete) { // register action can also be flow definition (subflow)
 	complete('done');
 });
-
 flow.start( function completionCallback(event) {
 	console.log('State finished');
 });
