@@ -1,4 +1,3 @@
-
 # Introduction
 A stateflow is a collection of steps which has to be executed in a controlled order.
 A step is defined as a state, a state has an action which is executed asynchronously.
@@ -23,6 +22,8 @@ The intention of stateflow is provide a means to implement high level processes,
 * Build and deploy systems
 * Device handling
 * Implementation of workflow processes
+
+
 # Usage
 
 ```
