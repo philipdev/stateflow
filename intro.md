@@ -2,7 +2,7 @@
 A stateflow is a collection of steps which has to be executed in a controlled order.
 A step is defined as a state, a state has an action which is executed asynchronously.
 The next state to go is defined as an "on" mapping either by mapping a state action completion event triggered by an execution callback or
-by an event emitted from one of the registered object.
+by an event emitted from one of the registered objects.
 
 A step/state is also a resting point, waiting for the next event/decision before going to the next state.
 
