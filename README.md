@@ -9,7 +9,7 @@ A step/state is also a resting point, waiting for the next event/decision before
 A flow can also be used as an action in an other flow, in this case it's a subflow where the flow end event as state completion event.
 
 ## Intention
-The intention of stateflow is provide a means to implement high level processes, using a flow/state machine as a programming language often tends more complex graph than the original implementation,
+The intention of stateflow is provide a means to implement high level processes, using a flow/state machine as a programming language often tends more complex graph than the original implementation.
 
 ## Example of shopping cart flow and checkout subflow from [stateflow-example](https://github.com/philipdev/stateflow-example)
 ### shopping card
@@ -86,7 +86,8 @@ flow.start( function completionCallback(event) {
     * [new stateflow~State(config, name, parent)](#new_module_stateflow..State)
     * [state.get(name)](#module_stateflow..State#get)
     * [state.set(name, obj)](#module_stateflow..State#set)
-    * [state.listenTo(objectOrName, event, listener)](#module_stateflow..State#listenTo)
+    * [state.onStateActive(objectOrName, event, listener)](#module_stateflow..State#onStateActive)
+    * [state.onFlowActive(objectOrName, event, listener)](#module_stateflow..State#onFlowActive)
     * [state.cancelTimeout()](#module_stateflow..State#cancelTimeout)
     * [state.installTimeout(timeout, handler)](#module_stateflow..State#installTimeout)
   * [class: stateflow~StateFlow](#module_stateflow..StateFlow)
@@ -110,7 +111,8 @@ flow.start( function completionCallback(event) {
     * [new stateflow~State(config, name, parent)](#new_module_stateflow..State)
     * [state.get(name)](#module_stateflow..State#get)
     * [state.set(name, obj)](#module_stateflow..State#set)
-    * [state.listenTo(objectOrName, event, listener)](#module_stateflow..State#listenTo)
+    * [state.onStateActive(objectOrName, event, listener)](#module_stateflow..State#onStateActive)
+    * [state.onFlowActive(objectOrName, event, listener)](#module_stateflow..State#onFlowActive)
     * [state.cancelTimeout()](#module_stateflow..State#cancelTimeout)
     * [state.installTimeout(timeout, handler)](#module_stateflow..State#installTimeout)
   * [class: stateflow~StateFlow](#module_stateflow..StateFlow)
@@ -146,7 +148,8 @@ State completion callback  available as first argument of `action` or as stateCo
   * [new stateflow~State(config, name, parent)](#new_module_stateflow..State)
   * [state.get(name)](#module_stateflow..State#get)
   * [state.set(name, obj)](#module_stateflow..State#set)
-  * [state.listenTo(objectOrName, event, listener)](#module_stateflow..State#listenTo)
+  * [state.onStateActive(objectOrName, event, listener)](#module_stateflow..State#onStateActive)
+  * [state.onFlowActive(objectOrName, event, listener)](#module_stateflow..State#onFlowActive)
   * [state.cancelTimeout()](#module_stateflow..State#cancelTimeout)
   * [state.installTimeout(timeout, handler)](#module_stateflow..State#installTimeout)
 
@@ -184,15 +187,25 @@ Set a property
 - name `string`  
 - obj `object` | `function` - object or getter function executed on `State#get`  
 
-<a name="module_stateflow..State#listenTo"></a>
-###state.listenTo(objectOrName, event, listener)
-Listen to a service event while this state is active.All events registered with 'listenTo' are automatically removed when the state exits.
+<a name="module_stateflow..State#onStateActive"></a>
+###state.onStateActive(objectOrName, event, listener)
+Listen to an event while the state is activeAll events registered with 'onStateActive' are automatically removed when the state exits.
 
 **Params**
 
 - objectOrName `object` | `string` - the service name (string) which was registered with set or event emitter instance (object),  
 - event `string` - the event to listen on  
 - listener `callback` | `string` - event listener function or state completion event  
+
+<a name="module_stateflow..State#onFlowActive"></a>
+###state.onFlowActive(objectOrName, event, listener)
+Listen for flow events while the flow is running an objectOrName, event, the listener will be registered only once.for the same set of arguments per state, even when called multiple times which is the typical use case.
+
+**Params**
+
+- objectOrName   
+- event   
+- listener   
 
 <a name="module_stateflow..State#cancelTimeout"></a>
 ###state.cancelTimeout()

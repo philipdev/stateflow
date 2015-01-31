@@ -133,17 +133,17 @@ describe('StateFlow', function () {
             }, 250);
         });
 
-        it('listenTo, listens only when active, completion event when listener is a string', function (done) {
+        it('onStateActive, listens only when active, completion event when listener is a string', function (done) {
             var flow = new StateFlow(flowDefinition), emitter = new EventEmitter();
             flow.set('emitter', emitter);
             flow.registerAction('endAction', function () {
                 assert.equal(emitter, this.get('emitter'));
-                this.listenTo('emitter', 'event', function () { // function listener
+                this.onStateActive('emitter', 'event', function () { // function listener
                     process.nextTick(function () {
                         emitter.emit('nextEvent');
                     });
                 });
-                this.listenTo('emitter', 'nextEvent', 'ended'); // completion event listener
+                this.onStateActive('emitter', 'nextEvent', 'ended'); // completion event listener
             });
             flow.start(function (event) {
                 assert.equal('ended', event);
@@ -189,5 +189,42 @@ describe('StateFlow', function () {
             emitter.emit('myEvent');
             emitter.emit('myEvent'); // this must be ignored!
         });
+        it('initialize and destroy must be called on flow entry and exit', function (done) {
+            var counter = 0;
+            var deinitCounter = 0;
+            var myFlowDefinition = {
+                beginState: {
+                    type: 'begin',
+                    initialize: function() {
+                        counter++;
+                    },
+                    destroy: function() {
+                        deinitCounter++;
+                    },
+                    action: function (complete) {
+                        this.get('service').emit('continue');
+                    },
+                    on: {
+                        'service.continue':'nextState'
+                    }
+                },
+                nextState: {
+                    type: 'end',
+                    action: function (cb) {
+                        cb('done');
+                    }
+                }
+            };
+            var flow = new StateFlow(myFlowDefinition), emitter = new EventEmitter();
+            flow.set('service', emitter);
+
+            flow.start(function () {
+                assert.equal(counter,1);
+                assert.equal(deinitCounter,1);
+                done();
+            });
+
+        });
+
     });
 });

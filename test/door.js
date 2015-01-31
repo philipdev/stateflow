@@ -119,8 +119,8 @@ describe('Door', function () {
                 if(door.lockStatus === 'locked') {
                     unlock();
                 } 
-                this.listenTo(door, 'locked', unlock); 
-                this.listenTo(door, 'unlocked', 'unlocked');
+                this.onStateActive(door, 'locked', unlock); 
+                this.onStateActive(door, 'unlocked', 'unlocked');
             },
             on: {
                 'unlocked':'openDoor',
@@ -149,9 +149,9 @@ describe('Door', function () {
                     if(door.status === 'closed') {
                         open();
                     }
-                    this.listenTo(door,'closed', open);
-                    this.listenTo(door,'unlocked', open);
-                    this.listenTo(door,'open');
+                    this.onStateActive(door,'closed', open);
+                    this.onStateActive(door,'unlocked', open);
+                    this.onStateActive(door,'open');
                 }
             }, 
             on: {
@@ -167,7 +167,7 @@ describe('Door', function () {
                 if(door.status ==='open') {
                     complete('doorOpen');
                 }
-                this.listenTo('door', 'open', 'doorOpen');
+                this.onStateActive('door', 'open', 'doorOpen');
             }
         },
         'failed' : {
