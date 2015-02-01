@@ -41,6 +41,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-graphviz');
     grunt.loadNpmTasks("grunt-jsdoc-to-markdown");
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-text-replace');
     
     grunt.initConfig({
         jshint: {
@@ -63,6 +64,16 @@ module.exports = function (grunt) {
               src: ['intro.md','usage.md','jsdoc.md'],
               dest: 'README.md',
             },
+        },
+        replace: {
+            jsmd: {
+                src: ['jsdoc.md'],
+                overwrite: true,                
+                replacements: [{
+                    from: /(#+)([a-zA-Z0-9+])/g,
+                    to: "$1 $2"
+                }]
+            }
         },        
         mochaTest: {
             test: {
@@ -87,7 +98,7 @@ module.exports = function (grunt) {
             }
         }
     });
-    grunt.registerTask('doc', ['jsdoc', 'jsdoc2md', 'concat']);
+    grunt.registerTask('doc', ['jsdoc', 'jsdoc2md', 'replace:jsmd','concat']);
     grunt.registerTask('default', ['jshint', 'mochaTest', 'doc']);
     grunt.registerTask('dot', function () { // still need to include then into the documentation
         var files = fs.readdirSync('test/flows');
