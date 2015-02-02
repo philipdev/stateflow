@@ -70,7 +70,7 @@ module.exports = function (grunt) {
                 src: ['jsdoc.md'],
                 overwrite: true,                
                 replacements: [{
-                    from: /^(#+)([a-zA-Z0-9+])/mg,
+                    from: /^(#+)([a-zA-Z0-9])/mg,
                     to: "$1 $2"
                 }]
             }

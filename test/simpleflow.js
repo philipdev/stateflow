@@ -124,6 +124,8 @@ describe('StateFlow', function () {
             flow.registerAction('endAction', function () {
                 assert(this.parent === flow); // random test
                 this.installTimeout(100, 'TIMEOUT');
+                this.installTimeout(100); // reinstall,TIMEOUT
+                this.installTimeout(); // reinstall in 100ms, TIMEOUT
             });
             flow.start(function (event) {
                 assert.equal('TIMEOUT', event);
@@ -158,7 +160,7 @@ describe('StateFlow', function () {
             emitter.emit('event');
             emitter.emit('event'); // this must be ignored!
         });
-        
+
         it('Forward service events', function (done) {
             var myFlowDefinition = {
                 beginState: {
@@ -167,7 +169,7 @@ describe('StateFlow', function () {
                         // does nothing, should this be the default action?
                     },
                     on: {
-                        'myService.myEvent':'nextState'
+                        'myService.myEvent': 'nextState'
                     }
                 },
                 nextState: {
@@ -195,17 +197,17 @@ describe('StateFlow', function () {
             var myFlowDefinition = {
                 beginState: {
                     type: 'begin',
-                    initialize: function() {
+                    initialize: function () {
                         counter++;
                     },
-                    destroy: function() {
+                    destroy: function () {
                         deinitCounter++;
                     },
                     action: function (complete) {
                         this.get('service').emit('continue');
                     },
                     on: {
-                        'service.continue':'nextState'
+                        'service.continue': 'nextState'
                     }
                 },
                 nextState: {
@@ -219,11 +221,41 @@ describe('StateFlow', function () {
             flow.set('service', emitter);
 
             flow.start(function () {
-                assert.equal(counter,1);
-                assert.equal(deinitCounter,1);
+                assert.equal(counter, 1);
+                assert.equal(deinitCounter, 1);
                 done();
             });
+        });
 
+        it('State events must also trigger state on match', function (done) {
+            var myFlowDefinition = {
+                beginState: {
+                    type: 'begin',
+                    action: function () {
+                        // does nothing, should this be the default action?
+                        this.emit('myEvent');
+                    },
+                    on: {
+                        'myEvent': 'nextState'
+                    }
+                },
+                nextState: {
+                    type: 'end',
+                    action: function (cb) {
+                        //cb('done');
+                        this.emit('done');
+                    },
+                    on: {
+                        'done':undefined
+                    }
+                }
+            };
+
+            var flow = new StateFlow(myFlowDefinition);
+            flow.start(function (event) {
+                assert.equal('done', event);
+                done();
+            });
         });
 
     });
