@@ -6,20 +6,22 @@ var stateflow = require('stateflow');
 var flow = new stateflow.StateFlow({
 	'entry-state' : {
 		type:'begin',
-		action: function(complete) {
+		action: function() {
 			this.someData = 'myData'; // <-- every state has an State object assigned to action this
-			complete('ignoredEvent');
-			complete('myEvent'); // the state is over
+			this.emit('ignoredEvent');
+			this.emit('myEvent'); // the state is over
 		},
 		on: {
 			'myEvent':'other-state'
 		}
 	},
 	'other-state': {
-		action: function(complete) { // can also be a flow definition (subflow).
+		initialize: function() { },
+		destroy: function() { },
+		action: function() { // can also be a flow definition (subflow).
 			this.get('myServiceOrData'); // <-- private field or inherented from parent flow
-			this.listenTo('myServiceOrData','event', 'signalEvent'); // <-- event listener, cancelled on exit
-			this.installTimeout(5000, 'timeout'); // <!-- state timeout, cancelled on state exit
+			this.onStateActive('myServiceOrData','event', 'signalEvent'); // <-- event listener, cancelled on exit
+			this.installTimeout(5000, 'timeout'); // <!-- emits: timeout after 5000ms (if state still active)
 		},
 		on: {
 			'timeout':'exit-state',
@@ -27,7 +29,7 @@ var flow = new stateflow.StateFlow({
 		}
 	},
 	'named-action-state': {
-		action:'myAction', //<-- register with registerAction(name, action), useful for json definition or generic action's
+		action:'myAction', // before: flow.registerAction('myAction', action)
 		on: {
 			'done':'exit-state',
 			'loop':'named-action-state'
@@ -40,6 +42,7 @@ var flow = new stateflow.StateFlow({
 		}
 	}
 });
+
 flow.set('myServiceOrData', emitter);
 flow.registerAction('myAction', function(complete) { // register action can also be flow definition (subflow)
 	complete('done');

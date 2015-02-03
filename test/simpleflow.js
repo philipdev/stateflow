@@ -252,10 +252,12 @@ describe('StateFlow', function () {
             };
 
             var flow = new StateFlow(myFlowDefinition);
-            flow.start(function (event) {
+            flow.on('flow:exit', function(event) {
                 assert.equal('done', event);
                 done();
-            });
+            }); // want use the same entry, exit event names for both state flow
+
+            flow.start();
         });
 
     });
