@@ -32,20 +32,22 @@ var stateflow = require('stateflow');
 var flow = new stateflow.StateFlow({
 	'entry-state' : {
 		type:'begin',
-		action: function(complete) {
+		action: function() {
 			this.someData = 'myData'; // <-- every state has an State object assigned to action this
-			complete('ignoredEvent');
-			complete('myEvent'); // the state is over
+			this.emit('ignoredEvent');
+			this.emit('myEvent'); // the state is over
 		},
 		on: {
 			'myEvent':'other-state'
 		}
 	},
 	'other-state': {
-		action: function(complete) { // can also be a flow definition (subflow).
+		initialize: function() { },
+		destroy: function() { },
+		action: function() { // can also be a flow definition (subflow).
 			this.get('myServiceOrData'); // <-- private field or inherented from parent flow
-			this.listenTo('myServiceOrData','event', 'signalEvent'); // <-- event listener, cancelled on exit
-			this.installTimeout(5000, 'timeout'); // <!-- state timeout, cancelled on state exit
+			this.onStateActive('myServiceOrData','event', 'signalEvent'); // <-- event listener, cancelled on exit
+			this.installTimeout(5000, 'timeout'); // <!-- emits: timeout after 5000ms (if state still active)
 		},
 		on: {
 			'timeout':'exit-state',
@@ -53,7 +55,7 @@ var flow = new stateflow.StateFlow({
 		}
 	},
 	'named-action-state': {
-		action:'myAction', //<-- register with registerAction(name, action), useful for json definition or generic action's
+		action:'myAction', // before: flow.registerAction('myAction', action)
 		on: {
 			'done':'exit-state',
 			'loop':'named-action-state'
@@ -66,6 +68,7 @@ var flow = new stateflow.StateFlow({
 		}
 	}
 });
+
 flow.set('myServiceOrData', emitter);
 flow.registerAction('myAction', function(complete) { // register action can also be flow definition (subflow)
 	complete('done');
@@ -159,7 +162,7 @@ Instance assigned to each state in a flow and bound to the action's this variabl
 
 **Params**
 
-- config `object` - subflow definition which might contain additional properties.  
+- config <code>[stateDefinition](#stateDefinition)</code> - subflow definition which might contain additional properties.  
 - name `string` - state name.  
 - parent `StateFlow` - flow.  
 
@@ -217,7 +220,7 @@ Install a state timeout handler, an active timeout is automatically cancelled be
 
 **Params**
 
-- timeout `integer` - timeout in milliseconds  
+- timeout `number` - timeout in milliseconds  
 - handler `callback` | `string` - function or completion event (string).  
 
 <a name="module_stateflow..StateFlow"></a>
@@ -255,7 +258,7 @@ Start the flow with the state of type 'begin'
 
 <a name="module_stateflow..StateFlow#getStateObject"></a>
 ### stateFlow.getStateObject(state)
-Get the state instance object, which is associated with the state action this.Used to provide functionallity and data state see {State}.For every state there is state object.
+Get the state instance object, which is associated with the state action this.Used to provide functionality and data state see {State}.For every state there is state object.
 
 **Params**
 
