@@ -12,7 +12,7 @@ A flow can also be used as an action in an other flow, in this case it's a subfl
 The intention of stateflow is provide a means to implement high level processes, using a flow/state machine as a programming language often tends more complex graph than the original implementation.
 
 ## Example of shopping cart flow and checkout subflow from [stateflow-example](https://github.com/philipdev/stateflow-example)
-### shopping card
+### shopping cart
 ![shopping cart flow](shopping.png)
 ### checkout subflow
 ![checkout subflow](checkout.png)

@@ -12,7 +12,7 @@ A flow can also be used as an action in an other flow, in this case it's a subfl
 The intention of stateflow is provide a means to implement high level processes, using a flow/state machine as a programming language often tends more complex graph than the original implementation.
 
 ## Example of shopping cart flow and checkout subflow from [stateflow-example](https://github.com/philipdev/stateflow-example)
-### shopping card
+### shopping cart
 ![shopping cart flow](shopping.png)
 ### checkout subflow
 ![checkout subflow](checkout.png)
@@ -192,7 +192,7 @@ Set a property
 
 <a name="module_stateflow..State#onStateActive"></a>
 ### state.onStateActive(objectOrName, event, listener)
-Listen to an event while the state is activeAll events registered with 'onStateActive' are automatically removed when the state exits.
+Listen to an event on the source (name or object) while the state is active, removed on exit.
 
 **Params**
 
@@ -202,13 +202,13 @@ Listen to an event while the state is activeAll events registered with 'onStat
 
 <a name="module_stateflow..State#onFlowActive"></a>
 ### state.onFlowActive(objectOrName, event, listener)
-Listen for flow events while the flow is running an objectOrName, event, the listener will be registered only once.for the same set of arguments per state, even when called multiple times which is the typical use case.
+Listen to an event on the source (name or object) while the flow is running, removed when the flow exits.
 
 **Params**
 
-- objectOrName   
-- event   
-- listener   
+- objectOrName `object` | `string` - object: the source object to listen on, string: the source name retrieved by state.get(name)  
+- event `string` - the event to listen on  
+- listener  - {string|function) string: send state completion event, function: event listener function.  
 
 <a name="module_stateflow..State#cancelTimeout"></a>
 ### state.cancelTimeout()
@@ -216,12 +216,12 @@ Cancel the previous installed timeout, always executed when state exits.Can be 
 
 <a name="module_stateflow..State#installTimeout"></a>
 ### state.installTimeout(timeout, handler)
-Install a state timeout handler, an active timeout is automatically cancelled before going to the next state.If handler is omitted then the last handler after cancelTimeout() will be reset also the last timeout time will be reset if omitted and available.
+Install a state timeout handler fired when the state is active, cancelled on state exit.
 
 **Params**
 
-- timeout `number` - timeout in milliseconds  
-- handler `callback` | `string` - function or completion event (string).  
+- timeout `number` | `undefined` - timeout in milliseconds, undefined: reuse the last timeout after the last cancelTimeout()  
+- handler `callback` | `string` | `undefined` - callback: timeout function, string: emit state event on timeout, undefined: reuse the last handler after cancelTimeout()  
 
 <a name="module_stateflow..StateFlow"></a>
 ## class: stateflow~StateFlow
@@ -235,7 +235,7 @@ Install a state timeout handler, an active timeout is automatically cancelled be
 
 <a name="new_module_stateflow..StateFlow"></a>
 ### new stateflow~StateFlow(config)
-StateFlow is an async event state machine, using js object notation.<br/>Each property is a state the value is the state definition, state definition has:<br/> action: function, register action, or subflow definition.<br/> on: a mapping between state completion events and target state<br/> type: 'begin': the initial state of the flow, 'end': the state that terminates the flow after execution the action.<pre>Usage:var flow = new StateFlow({     beginState: {         type: 'begin',         action: function (complete) {             complete('anEvent');         },         on: {             anEvent:'nextState'         }     },     nextState: {         type: 'end',         action: function (complete) {             complete('done');          }      }});flow.start(function (event) {    if(event !== 'done') throw new Error('event must be done, as in nextState');});</pre>
+StateFlow is an async event state machine, using js object notation.<br/>Every property is a state, the key is state name and the value is the state config:<br/> action: function, register action, or subflow definition.<br/> on: on key source event (or sourceObjectName.event) goto value: the next state<br/> type: 'begin': the initial state of the flow, 'end': the state that terminates the flow after executing action.<pre>Usage:var flow = new StateFlow({     beginState: {         type: 'begin',         action: function (complete) {             complete('anEvent');         },         on: {             anEvent:'nextState'         }     },     nextState: {         type: 'end',         action: function (complete) {             complete('done');          }      }});flow.start(function (event) {    if(event !== 'done') throw new Error('event must be done, as in nextState');});</pre>
 
 **Params**
 
@@ -258,7 +258,7 @@ Start the flow with the state of type 'begin'
 
 <a name="module_stateflow..StateFlow#getStateObject"></a>
 ### stateFlow.getStateObject(state)
-Get the state instance object, which is associated with the state action this.Used to provide functionality and data state see {State}.For every state there is state object.
+Get the state instance object also associated with the state action this.Used to provide functionality and data to a state see {State}.For every state there is state object.
 
 **Params**
 
