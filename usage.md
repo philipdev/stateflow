@@ -51,3 +51,9 @@ flow.start( function completionCallback(event) {
 	console.log('State finished');
 });
 ```
+# Browser
+
+There is also a browserified version available in browser/stateflow.js, to use this include this in your html with the script tag, after this the module is available as stateflow in the window object.
+
+E.g: new window.stateflow.StateFlow({}); to create a new state flow
+
