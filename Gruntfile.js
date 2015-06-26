@@ -42,8 +42,22 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-jsdoc-to-markdown");
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-text-replace');
+    grunt.loadNpmTasks('grunt-browserify');
     
     grunt.initConfig({
+        browserify: {
+            dist: {
+                options: { // TODO: add mimify/source maps
+                    //transform: ['browserify-shim']
+                    browserifyOptions: {
+                        standalone:'stateflow'
+                    }
+                },
+                files: { // Browserify should expose StateFlow on the window
+                    'browser/stateflow.js': ['./lib/stateflow.js']
+                }
+            }
+        },
         jshint: {
             all: ['lib/*.js', 'test/*.js', 'Gruntfile.js']
         },
@@ -99,7 +113,7 @@ module.exports = function (grunt) {
         }
     });
     grunt.registerTask('doc', ['jsdoc', 'jsdoc2md', 'replace:jsmd','concat']);
-    grunt.registerTask('default', ['jshint', 'mochaTest', 'doc']);
+    grunt.registerTask('default', ['jshint', 'mochaTest', 'browserify','doc']);
     grunt.registerTask('dot', function () { // still need to include then into the documentation
         var files = fs.readdirSync('test/flows');
         files.forEach(function (file) {
