@@ -1,0 +1,85 @@
+/*
+ * State definition language
+ */
+{
+
+}
+start = (comment/functionProperty/property/event)+
+
+event    = whitespace from:name whitespace on:(propertyNameLiteral / propertyNameLookup ) whitespace '->' whitespace to:name  terminator {
+    return ['event', from, on, to ];
+}
+
+property = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup )  '=' whitespace value:value  terminator {
+   return ['property', state, property, value];
+} 
+
+functionProperty = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup ) functionBody: funcBlock {
+	return ['function', state, property,  functionBody];
+}
+ 
+funcBlock = block
+
+
+block = ( '{' statements: ( block / [^{}]+ )* '}' ) {
+	function join(array,pre) {
+		return array.reduce(function(prev, current) {
+			if(current instanceof Array) {
+				return join(current, prev);
+			} else {
+				return prev + current;
+			}
+		},pre);
+	}
+
+	//console.log(statements);
+	return '{' + join(statements, '') + '}';
+}
+
+
+propertyNameLookup = '[' whitespace  property:(singleQuote/doubleQuote/valueNumber) whitespace  ']' whitespace {
+	return property;
+}
+
+propertyNameLiteral = '.' whitespace property:name whitespace  whitespace {
+	return property;
+}
+
+valueNumber = n:number {
+   return parseFloat(n.join(''));
+}
+number = [0-9.]+
+
+valueFalse = whitespace 'false' whitespace {
+	return false;
+}
+
+valueTrue = whitespace 'true' whitespace {
+	return true;
+}
+
+// Must be either literal or string
+valueLiteral = l:valuereq {
+   return l.join('');  
+}
+valueString = v:(singleQuote / doubleQuote) {
+	return v;
+}
+// valueObject = '{' '}'
+
+name = nx:(valueNumber / valueLiteral / valueString) {
+	return nx;
+}
+value = valueTrue / valueFalse / valueNumber  / valueLiteral / valueString  // valueObject
+valuereq= [@a-zA-Z0-9\-_*]+
+
+singleQuote= "'" x:[^']*"'" {
+	return x.join('');
+}
+
+doubleQuote= '"' x:[^"]* '"' {
+	return x.join('');
+}
+comment = whitespace '//' [^\n]* ('\n'/!.)
+terminator = [ \t\r]* ([;\n]/comment/!.) 
+whitespace = [ \t\n\r]*
