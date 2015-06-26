@@ -77,12 +77,19 @@ flow.start( function completionCallback(event) {
 	console.log('State finished');
 });
 ```
+# Browser
+
+There is also a browserified version available in browser/stateflow.js, to use this include this in your html with the script tag, after this the module is available as stateflow in the window object.
+
+E.g: new window.stateflow.StateFlow({}); to create a new state flow
+
 
 # Index
 
 **Modules**
 
 * [stateflow](#module_stateflow)
+  * [stateflow.create(flowSource, name, parent, loader)](#module_stateflow.create)
   * [callback: stateflow~action](#module_stateflow..action)
   * [callback: stateflow~completion](#module_stateflow..completion)
   * [class: stateflow~State](#module_stateflow..State)
@@ -97,6 +104,10 @@ flow.start( function completionCallback(event) {
     * [new stateflow~StateFlow(config)](#new_module_stateflow..StateFlow)
     * [stateFlow.start(complete)](#module_stateflow..StateFlow#start)
     * [stateFlow.getStateObject(state)](#module_stateflow..StateFlow#getStateObject)
+
+**Functions**
+
+* [parse()](#parse)
 
 **Typedefs**
 
@@ -108,6 +119,7 @@ flow.start( function completionCallback(event) {
 **Members**
 
 * [stateflow](#module_stateflow)
+  * [stateflow.create(flowSource, name, parent, loader)](#module_stateflow.create)
   * [callback: stateflow~action](#module_stateflow..action)
   * [callback: stateflow~completion](#module_stateflow..completion)
   * [class: stateflow~State](#module_stateflow..State)
@@ -122,6 +134,17 @@ flow.start( function completionCallback(event) {
     * [new stateflow~StateFlow(config)](#new_module_stateflow..StateFlow)
     * [stateFlow.start(complete)](#module_stateflow..StateFlow#start)
     * [stateFlow.getStateObject(state)](#module_stateflow..StateFlow#getStateObject)
+
+<a name="module_stateflow.create"></a>
+## stateflow.create(flowSource, name, parent, loader)
+Create a flow from a flow definition languageSyntax: state.action = myAction; // or any other property state.event -> next-state;  Also: state.property = valuevalue can be either a boolean, number or string. Quoted strings accept all characters except the quote used. a literal string only allows alpha numeric and -All actions must be registered with registerAction.
+
+**Params**
+
+- flowSource `string` - source text of the simple flow language  
+- name `string` - flow name optional  
+- parent `StateFlow` - parent flow if this is a subflow  
+- loader `function` - resource loader  
 
 <a name="module_stateflow..action"></a>
 ## callback: stateflow~action
@@ -258,13 +281,17 @@ Start the flow with the state of type 'begin'
 
 <a name="module_stateflow..StateFlow#getStateObject"></a>
 ### stateFlow.getStateObject(state)
-Get the state instance object also associated with the state action this.Used to provide functionality and data to a state see {State}.For every state there is state object.
+Get the state instance object also associated with the state action this.Used to provide functionality and data to a state see {State}.For every state there is state instance.
 
 **Params**
 
 - state `string` - state name to get an state object for  
 
 **Returns**: `State` - state instance object  
+<a name="parse"></a>
+# parse()
+Creates a flow definition object from a simple flow language which can be passed to the StateFlow constructor
+
 <a name="stateDefinition"></a>
 # type: stateDefinition
 **Properties**

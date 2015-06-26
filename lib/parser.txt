@@ -10,7 +10,7 @@ event    = whitespace from:name whitespace on:(propertyNameLiteral / propertyNam
     return ['event', from, on, to ];
 }
 
-property = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup )  '=' whitespace value:value  terminator {
+property = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup )  '=' whitespace value:value terminator {
    return ['property', state, property, value];
 } 
 
@@ -41,7 +41,7 @@ propertyNameLookup = '[' whitespace  property:(singleQuote/doubleQuote/valueNumb
 	return property;
 }
 
-propertyNameLiteral = '.' whitespace property:name whitespace  whitespace {
+propertyNameLiteral = '.' whitespace property:name whitespace  {
 	return property;
 }
 
@@ -50,11 +50,11 @@ valueNumber = n:number {
 }
 number = [0-9.]+
 
-valueFalse = whitespace 'false' whitespace {
+valueFalse = 'false' {
 	return false;
 }
 
-valueTrue = whitespace 'true' whitespace {
+valueTrue = 'true'  {
 	return true;
 }
 
