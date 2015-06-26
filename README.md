@@ -83,6 +83,25 @@ There is also a browserified version available in browser/stateflow.js, to use t
 
 E.g: new window.stateflow.StateFlow({}); to create a new state flow
 
+# There is also a simple flow langauge
+## Example
+```
+var stateflow = require('stateflow');
+var flow = stateflow.create( source );
+```
+
+## Syntax
+```
+state.event -> other-state
+state.action = namedAction // registered with registerAction, action is just a property
+state.action {
+	// function body 
+}
+state.type = begin
+state.bool = true
+state.number = 66
+state.specialChars = '$@%@%@%'
+```
 
 # Index
 
