@@ -26,10 +26,15 @@ The intention of stateflow is provide a means to implement high level processes,
 ## Javascript
 ```
 var stateflow = require('stateflow');
-stateflow.create(fs.readFileSync('myflow.txt','utf8'));
+var flow = stateflow.create(fs.readFileSync('myflow.txt','utf8'));
 
 flow.set('myService', service);
 flow.registerAction('namedAction', func);
+
+flow.start(function(event) {
+	console.log('flow ended with:', event);
+});
+
 ```
 ## Example flow a -> b -> c
 ```
