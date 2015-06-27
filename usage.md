@@ -1,78 +1,68 @@
 # Usage
-
+## Javascript
 ```
 var stateflow = require('stateflow');
-// Create a flow with flow definition (see jsdoc)
-var flow = new stateflow.StateFlow({
-	'entry-state' : {
-		type:'begin',
-		action: function() {
-			this.someData = 'myData'; // <-- every state has an State object assigned to action this
-			this.emit('ignoredEvent');
-			this.emit('myEvent'); // the state is over
-		},
-		on: {
-			'myEvent':'other-state'
-		}
-	},
-	'other-state': {
-		initialize: function() { },
-		destroy: function() { },
-		action: function() { // can also be a flow definition (subflow).
-			this.get('myServiceOrData'); // <-- private field or inherented from parent flow
-			this.onStateActive('myServiceOrData','event', 'signalEvent'); // <-- event listener, cancelled on exit
-			this.installTimeout(5000, 'timeout'); // <!-- emits: timeout after 5000ms (if state still active)
-		},
-		on: {
-			'timeout':'exit-state',
-			'signalEvent':'named-action-state'
-		}
-	},
-	'named-action-state': {
-		action:'myAction', // before: flow.registerAction('myAction', action)
-		on: {
-			'done':'exit-state',
-			'loop':'named-action-state'
-		}
-	},
-	'exit-state' : {
-		type: 'end',
-		action: function(complete) {
-			complete('exitEvent');
-		}
-	}
-});
+stateflow.create(fs.readFileSync('myflow.txt','utf8'));
 
-flow.set('myServiceOrData', emitter);
-flow.registerAction('myAction', function(complete) { // register action can also be flow definition (subflow)
-	complete('done');
-});
-flow.start( function completionCallback(event) {
-	console.log('State finished');
-});
+flow.set('myService', service);
+flow.registerAction('namedAction', func);
 ```
+## Flow
+
+a.type = begin
+a.action (
+	// regular js function body, where 'this' is the current State object
+	// only the global scope, you must use flow.set('name', obj); for external services
+	this.emit('ignore');
+	this.emit('next'); // first matched event finishes the current state
+	this.emit('next'); // ignored
+}
+
+a.next -> b
+a.'service.event' -> b // does not exist in this example
+
+b.action {
+	this.installTimeout(100, 'mytimeout');
+}
+
+b.mytimeout -> c
+b.other -> a
+
+c.type = end
+c.action {
+	// can't use emit here, since there is no event mapping on end states.
+	this.stateComplete('finish');
+}
+
 # Browser
 
-There is also a browserified version available in browser/stateflow.js, to use this include this in your html with the script tag, after this the module is available as stateflow in the window object.
+There is also a browserify version available.
 
-E.g: new window.stateflow.StateFlow({}); to create a new state flow
+ * Include in browser/stateflow.js
+ * Use `new stateflow.StateFlow(config)` or `stateflow.create(source)`
 
-# There is also a simple flow langauge
-## Example
-```
-var stateflow = require('stateflow');
-var flow = stateflow.create( source );
-```
 
-## Syntax
+# Simple flow langauge
+
 ```
+// Transtions
 state.event -> other-state
-state.action = namedAction // registered with registerAction, action is just a property
+state.otherEvent -> other-state
+state.'service.event' -> other-state
+// Actions
+//  namedAction registered with flow.registerAction(name, func)
+state.action = namedAction 
+// embedded js function body, also State is bind to this here
 state.action {
 	// function body 
+	this.emit('next');
 }
+// Types
+// begin and end states must have a type (begin, end) 
 state.type = begin
+// Other properties (accessible via state.config.<propertry>)
 state.bool = true
 state.number = 66
+// If a you need to have special characters in our string (double qoutes are also possible)
 state.specialChars = '$@%@%@%'
 ```
