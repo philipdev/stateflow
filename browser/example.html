@@ -1,0 +1,27 @@
+<html>
+	<head>
+		<script type="text/javascript" src="stateflow.js" >
+		</script>
+	
+		<script type="text/javascript">
+		var script = 	
+			"start.type = begin\n" +
+			"start.action {\n" +
+			"console.log('next');\n" +
+			"this.emit('next');\n" +
+			"}\n" +
+			"start.next -> end\n" +
+			"end.type = end\n" +
+			"end.action {\n" +
+			"console.log('next');\n" +
+			"	this.stateComplete('finish');\n" +
+			"}\n";
+		var flow = stateflow.create(script);
+		flow.start( function(event) {
+			console.log('flow:', event);
+		});
+		
+		</script>
+	</head>
+
+</html>
