@@ -43,6 +43,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-text-replace');
     grunt.loadNpmTasks('grunt-browserify');
+    grunt.loadNpmTasks('grunt-peg');
     
     grunt.initConfig({
         browserify: {
@@ -58,8 +59,14 @@ module.exports = function (grunt) {
                 }
             }
         },
+        peg: {
+            flowParser: {
+                src: "lib/parser.txt",
+                dest: "lib/generatedParser.js"
+            }
+        },
         jshint: {
-            all: ['lib/*.js', 'test/*.js', 'Gruntfile.js']
+            all: ['index.js', 'lib/parser.js', 'lib/stateflow.js', 'test/*.js', 'Gruntfile.js']
         },
         jsdoc : {
             js : {
@@ -113,7 +120,7 @@ module.exports = function (grunt) {
         }
     });
     grunt.registerTask('doc', ['jsdoc', 'jsdoc2md', 'replace:jsmd','concat']);
-    grunt.registerTask('default', ['jshint', 'mochaTest', 'browserify','doc']);
+    grunt.registerTask('default', ['peg:flowParser','jshint', 'mochaTest', 'browserify','doc']);
     grunt.registerTask('dot', function () { // still need to include then into the documentation
         var files = fs.readdirSync('test/flows');
         files.forEach(function (file) {

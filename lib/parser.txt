@@ -4,20 +4,24 @@
 {
 
 }
-start = (comment/functionProperty/property/event)+
+start = (comment/functionProperty/property/event/ignoreSpace)*
+
 
 event    = whitespace from:name whitespace on:(propertyNameLiteral / propertyNameLookup ) whitespace '->' whitespace to:name  terminator {
-    return ['event', from, on, to ];
+    return {type:'event', from: from, to:to, on: on};
+
 }
 
 property = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup )  '=' whitespace value:value terminator {
-   return ['property', state, property, value];
-} 
 
-functionProperty = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup ) functionBody: funcBlock {
-	return ['function', state, property,  functionBody];
+   return {type:'property', state: state, property:property, value: value};
 }
- 
+
+functionProperty = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup ) functionBody: funcBlock terminator {
+    return {type:'function', state: state, property:property, body: functionBody};
+}
+
+
 funcBlock = block
 
 
@@ -80,6 +84,14 @@ singleQuote= "'" x:[^']*"'" {
 doubleQuote= '"' x:[^"]* '"' {
 	return x.join('');
 }
-comment = whitespace '//' [^\n]* ('\n'/!.)
-terminator = [ \t\r]* ([;\n]/comment/!.) 
+
+comment = whitespace '//' [^\n]* ('\n'/!.) {
+    return {type:'comment'};
+}
+
+ignoreSpace = [ \t\n\r]+ {
+    return {type:'space'};
+}
+
+terminator = [ \t\r]* ([;\n]/comment/!.) whitespace
 whitespace = [ \t\n\r]*
