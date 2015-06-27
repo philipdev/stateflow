@@ -31,8 +31,8 @@ stateflow.create(fs.readFileSync('myflow.txt','utf8'));
 flow.set('myService', service);
 flow.registerAction('namedAction', func);
 ```
-## Flow
-
+## Example flow a -> b -> c
+```
 a.type = begin
 a.action (
 	// regular js function body, where 'this' is the current State object
@@ -57,6 +57,7 @@ c.action {
 	// can't use emit here, since there is no event mapping on end states.
 	this.stateComplete('finish');
 }
+```
 
 # Browser
 
