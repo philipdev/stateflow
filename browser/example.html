@@ -2,26 +2,38 @@
 	<head>
 		<script type="text/javascript" src="stateflow.js" >
 		</script>
-	
+		<script type="text/template" id="flowScript">
+			begin.type = begin
+			begin.action {
+				this.emit('next');
+			}
+			begin.next -> stop
+			
+			stop.action {
+				this.get('button').innerHTML = "start";
+			}			
+			stop.'button.click' -> start
+			start.action {
+				this.get('button').innerHTML = "stop";
+			}
+			start.'button.click' -> stop
+
+		</script>
+		
+		
+	</head>
+	<body>
+		<button id="myButton">start</button>
 		<script type="text/javascript">
-		var script = 	
-			"start.type = begin\n" +
-			"start.action {\n" +
-			"console.log('next');\n" +
-			"this.emit('next');\n" +
-			"}\n" +
-			"start.next -> end\n" +
-			"end.type = end\n" +
-			"end.action {\n" +
-			"console.log('next');\n" +
-			"	this.stateComplete('finish');\n" +
-			"}\n";
-		var flow = stateflow.create(script);
+		console.log(document.getElementById('flowScript').innerHTML);
+		var flow = stateflow.create(document.getElementById('flowScript').innerHTML);
+		
+		var button = document.getElementById('myButton')
+		flow.set('button', button);
+		
 		flow.start( function(event) {
 			console.log('flow:', event);
 		});
-		
 		</script>
-	</head>
-
+	</body>
 </html>
