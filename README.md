@@ -97,257 +97,112 @@ state.number = 66
 state.specialChars = '$@%@%@%'
 ```
 
-## Classes
-<dl>
-<dt><a href="#StateFlow">StateFlow</a> ⇐ <code>State</code></dt>
-<dd></dd>
-</dl>
-## Functions
-<dl>
-<dt><a href="#parse">parse()</a></dt>
-<dd><p>Creates a flow definition object from a simple flow language which can be passed to the StateFlow constructor</p>
-</dd>
-<dt><a href="#Get an object value from the current state or it's parents.">Get an object value from the current state or it's parents.(name)</a></dt>
-<dd></dd>
-<dt><a href="#create">create(flowSource, name, parent, loader)</a></dt>
-<dd><p>Create a flow from a flow definition language
-Syntax:
- state.action = myAction; // or any other property
- state.event -&gt; next-state;</p>
-<p> Also:
- state.property = value
-value can be either a boolean, number or string. 
-Quoted strings accept all characters except the quote used. a literal string only allows alpha numeric and -
-All actions must be registered with registerAction.</p>
-</dd>
-</dl>
-## Events
-<dl>
-<dt><a href="#exit State exit event with the completed state name,event_ at this point the state is no longer active.">" at this point the state is no longer active." (config, name, parent)</a></dt>
-<dd><p>Instance assigned to each state in a flow and bound to the action&#39;s this variable.</p>
-</dd>
-</dl>
-## Typedefs
-<dl>
-<dt><a href="#stateDefinition">stateDefinition</a></dt>
-<dd></dd>
-<dt><a href="#flowDefinition">flowDefinition</a> : <code>object</code></dt>
-<dd></dd>
-<dt><a href="#action">action</a> : <code>function</code></dt>
-<dd><p>State activation action, can be defined as function, by name (string) or by subflow definition (object).<br/>
-If it was defined by name in the state definition then the must be been registered previously with registerAction().<br/>
-If defined by flow definition then start and end of the flow will be mapped to the state.</p>
-</dd>
-<dt><a href="#completion">completion</a> : <code>function</code></dt>
-<dd><p>State completion callback  available as first argument of <a href="#action">action</a> or as stateComplete property of <a href="State">State</a>.</p>
-</dd>
-</dl>
-<a name="StateFlow"></a>
-## StateFlow ⇐ <code>State</code>
-**Kind**: global class  
-**Extends:** <code>State</code>  
-**Properties**
+## Install
+`npm install stateflow --save`
 
-| Name | Type |
-| --- | --- |
-| currentState | <code>string</code> | 
-| parent | <code>[StateFlow](#StateFlow)</code> | 
+## Module
+`var stateflow = require('stateflow');`
 
 
-* [StateFlow](#StateFlow) ⇐ <code>State</code>
-  * [new StateFlow(config)](#new_StateFlow_new)
-  * _instance_
-    * [.start(complete)](#StateFlow+start)
-    * [.getStateObject(state)](#StateFlow+getStateObject) ⇒ <code>State</code>
-    * [.set(name, obj)](#State+set)
-    * [.onStateActive(objectOrName, event, listener)](#State+onStateActive)
-    * [.onFlowActive(objectOrName, event, listener)](#State+onFlowActive)
-    * [.cancelTimeout()](#State+cancelTimeout)
-    * [.installTimeout(timeout, handler)](#State+installTimeout)
-  * _inner_
-    * ["state:stateName"](#StateFlow..state_stateName)
-    * ["stateChanged" (state, oldState)](#StateFlow..event_stateChanged)
-    * [~stateDefinition](#StateFlow..stateDefinition) : <code>object</code>
-    * [~flowDefinition](#StateFlow..flowDefinition) : <code>object</code>
+## JavaScript object notation
+```
+{
+   <stateName>: {
+	   initialize: <function>,
+	   destroy: <function>, 
+	   action: <function> | <namedAction> | <js subflow object>	
+       on: {
+			<event|service.event>:'<nextState>'
+	   }
+	   ... other properties
+   }
+}
+```
+ 		
+## Simple stateflow language notation
 
-<a name="new_StateFlow_new"></a>
-### new StateFlow(config)
-StateFlow is an async event state machine, using js object notation.<br/>Every property is a state, the key is state name and the value is the state config:<br/> action: function, register action, or subflow definition.<br/> on: on key source event (or sourceObjectName.event) goto value: the next state<br/> type: 'begin': the initial state of the flow, 'end': the state that terminates the flow after executing action.<pre>Usage:var flow = new StateFlow({     beginState: {         type: 'begin',         action: function (complete) {             complete('anEvent');         },         on: {             anEvent:'nextState'         }     },     nextState: {         type: 'end',         action: function (complete) {             complete('done');          }      }});flow.start(function (event) {    if(event !== 'done') throw new Error('event must be done, as in nextState');});</pre>
+A stateflow consists of zero or more statement a statement is terminated either by a newline or semicolon (;) .
+
+'''Transitions''' is a statement defined in the format '''<state>'''.'''<event>''' -> '''<targetState>'''.
+
+`state.event -> target`
+
+Every of 3 different names may also be enclosed in single or double quotes, this is for example needed if you need to create a transition on a service which is delimited by a dot
+and which is not allowed in a literal string.
+
+`state.'myService.event' -> next`
+
+'''State properties''' is a statement defined in the format '''state'''.'''property''' = '''value'''
+```
+	state.number = 9.9
+	state.action = namedAction
+	state.specialString = '!!! extra !!!'
+	state.flag = true
+```	
+The action property is the action to be executed when the state becomes active.
+
+The '''type''' property is to specify whether a state is a '''begin''', '''end''' or regular state is, and must be set for begin and end states.
+
+The state maybe be a quoted or a literal string, the property may be a quoted, literal string or number, the value may be a quoted, literal string, number or boolean.
+
+'''State function property''' is a statement defined in the format '''state'''.'''property''' = { }, general used to define actions
 
 
-| Param | Type | Description |
-| --- | --- | --- |
-| config | <code>[flowDefinition](#flowDefinition)</code> | flow definition |
+The state and property have the same restrictions as a regular '''State property''' then curly brackets enclose a JavaScript function body and are generally used to implement state actions.
+```
+	state.action {
+		this.emit('event');
+	}
+```
 
-<a name="StateFlow+start"></a>
-### stateFlow.start(complete)
-Start the flow with the state of type 'begin'
+'''A literal string''' is string without quotes out following characters of 0-9, a-Z, @, -, _  
 
-**Kind**: instance method of <code>[StateFlow](#StateFlow)</code>  
+'''A literal number''' a number can have any digit, minus sign and a dot (.)
 
-| Param | Type | Description |
-| --- | --- | --- |
-| complete | <code>[completion](#completion)</code> | callback to be called when the end state has been reached. |
+'''A literal boolean''' a boolean can be either '''true''' or '''false'''
 
-<a name="StateFlow+getStateObject"></a>
-### stateFlow.getStateObject(state) ⇒ <code>State</code>
-Get the state instance object also associated with the state action this.Used to provide functionality and data to a state see {State}.For every state there is state instance.
+'''Quoted strings''' can have any characters except the the quotes which it was enclosed in.
 
-**Kind**: instance method of <code>[StateFlow](#StateFlow)</code>  
-**Returns**: <code>State</code> - state instance object  
+## Create a flow
+Use `var flow = new stateflow.StateFlow(obj);` to create a flow with js object nation.
 
-| Param | Type | Description |
-| --- | --- | --- |
-| state | <code>string</code> | state name to get an state object for |
+Use `var flow = stateflow.create(flowLanguage)` to create a flow with the flow language
+## State 
+StateFlow inherent EventEmitter and thereby have all methods EventEmitter.
+### Methods
+* get(name) - get a service from the current state or parent(s), bottom to top.
+* set(name, service)
+* onStateActive(service, event, listener) - listen for events on the service (name or object) while the state is active (aka automatically removed)
+* onFlowActive(service, event, listener) - listen for events on the service (name or object) while the flow is running
+* installTimeout(timeout, listener) - listener can be a function or an event to be emitted, if the listener or timeout is an integer in milliseconds, if arguments are omitted then the last is used after the last cancelTimeout()
+* cancelTimeout() - cancel a previously installed timeout, always executed on state exit
+* stateComplete(event) - try to complete the current state with the specified event.
 
-<a name="State+set"></a>
-### stateFlow.set(name, obj)
-Set a property
+### Properties
+* active - true or false indicating if the state is active
+* config - the js object definition of the state
+* parent - the parent flow.
 
-**Kind**: instance method of <code>[StateFlow](#StateFlow)</code>  
+### Events
+* entry
+* exit
+* <errorCode> - when an exception thrown by the state action, will try to complete the state with the '''code''' property of the error (if exists).
+* exception - when exception was thrown in the state action and no handler was found with then the exception event is emitted, if there is no handler for that then the error is emitted on the flow.
 
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> |  |
-| obj | <code>object</code> &#124; <code>function</code> | object or getter function executed on [State#get](State#get) |
+## StateFlow
+StateFlow inherent State and thereby have all methods, events and properties of State.
+### Methods
+* start(callback) - execute the flow and call the callback when finished. the event is passed as 
+* getStateObject(statName)
+* registerAction(name, action, initializer, desctructor) - name is a stirng, action can be a function or a js object subflow, initializer and destructors are optional functions.
 
-<a name="State+onStateActive"></a>
-### stateFlow.onStateActive(objectOrName, event, listener)
-Listen to an event on the source (name or object) while the state is active, removed on exit.
+### Properties
+* currentState
 
-**Kind**: instance method of <code>[StateFlow](#StateFlow)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| objectOrName | <code>object</code> &#124; <code>string</code> | the service name (string) which was registered with set or event emitter instance (object), |
-| event | <code>string</code> | the event to listen on |
-| listener | <code>callback</code> &#124; <code>string</code> | event listener function or state completion event |
-
-<a name="State+onFlowActive"></a>
-### stateFlow.onFlowActive(objectOrName, event, listener)
-Listen to an event on the source (name or object) while the flow is running, removed when the flow exits.
-
-**Kind**: instance method of <code>[StateFlow](#StateFlow)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| objectOrName | <code>object</code> &#124; <code>string</code> | object: the source object to listen on, string: the source name retrieved by state.get(name) |
-| event | <code>string</code> | the event to listen on |
-| listener |  | {string|function) string: send state completion event, function: event listener function. |
-
-<a name="State+cancelTimeout"></a>
-### stateFlow.cancelTimeout()
-Cancel the previous installed timeout, always executed when state exits.Can be used within a state action.
-
-**Kind**: instance method of <code>[StateFlow](#StateFlow)</code>  
-<a name="State+installTimeout"></a>
-### stateFlow.installTimeout(timeout, handler)
-Install a state timeout handler fired when the state is active, cancelled on state exit.
-
-**Kind**: instance method of <code>[StateFlow](#StateFlow)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| timeout | <code>number</code> &#124; <code>undefined</code> | timeout in milliseconds, undefined: reuse the last timeout after the last cancelTimeout() |
-| handler | <code>callback</code> &#124; <code>string</code> &#124; <code>undefined</code> | callback: timeout function, string: emit state event on timeout, undefined: reuse the last handler after cancelTimeout() |
-
-<a name="StateFlow..state_stateName"></a>
-### "state:stateName"
-Event fired when a specific stateName state has been reached, if new listener is added with an state:stateName which is alreadycurrent then the event will also be fired (stateName must must be replaced with an actual state).
-
-**Kind**: event emitted by <code>[StateFlow](#StateFlow)</code>  
-<a name="StateFlow..event_stateChanged"></a>
-### "stateChanged" (state, oldState)
-Emitted for every state change,
-
-**Kind**: event emitted by <code>[StateFlow](#StateFlow)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| state | <code>string</code> | new state |
-| oldState | <code>string</code> | previous state |
-
-<a name="StateFlow..stateDefinition"></a>
-### StateFlow~stateDefinition : <code>object</code>
-**Kind**: inner typedef of <code>[StateFlow](#StateFlow)</code>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| action | <code>string</code> &#124; <code>[action](#action)</code> &#124; <code>[flowDefinition](#flowDefinition)</code> | this action is executed when the state becomes active |
-|  | <code>object</code> | on event <key> goto state <value>, the event source is the instance state or an object (separated by a dot: "source.event" : "nextstate". |
-
-<a name="StateFlow..flowDefinition"></a>
-### StateFlow~flowDefinition : <code>object</code>
-where the key is the state and the value a [stateDefinition](#stateDefinition)
-
-**Kind**: inner typedef of <code>[StateFlow](#StateFlow)</code>  
-<a name="parse"></a>
-## parse()
-Creates a flow definition object from a simple flow language which can be passed to the StateFlow constructor
-
-**Kind**: global function  
-<a name="Get an object value from the current state or it's parents."></a>
-## Get an object value from the current state or it's parents.(name)
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | the object name |
-
-<a name="create"></a>
-## create(flowSource, name, parent, loader)
-Create a flow from a flow definition languageSyntax: state.action = myAction; // or any other property state.event -> next-state;  Also: state.property = valuevalue can be either a boolean, number or string. Quoted strings accept all characters except the quote used. a literal string only allows alpha numeric and -All actions must be registered with registerAction.
-
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| flowSource | <code>string</code> | source text of the simple flow language |
-| name | <code>string</code> | flow name optional |
-| parent | <code>[StateFlow](#StateFlow)</code> | parent flow if this is a subflow |
-| loader | <code>function</code> | resource loader |
-
-<a name="stateDefinition"></a>
-## stateDefinition
-**Kind**: global typedef  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| type | <code>string</code> | 'begin': initial state on flow start, 'state': normal state (default), 'end': flow terminates when this state |
-| action | <code>[action](#action)</code> | executed when the state becomes active, defined a function, action name to use a registered action or subflow object flow defintion. |
-| initialize | <code>function</code> | is called when the flow starts. |
-| destroy | <code>function</code> | is called when the flow exits. |
-| on | <code>object</code> | key is state completion event value is the next state to goto. 'objectName.eventName' is also supported, aka if this.get('objectName') emits eventName then goto the next state . |
-
-<a name="flowDefinition"></a>
-## flowDefinition : <code>object</code>
-**Kind**: global typedef  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| *stateName* | <code>[stateDefinition](#stateDefinition)</code> | every state has a state name and a state definition. |
-
-<a name="action"></a>
-## action : <code>function</code>
-State activation action, can be defined as function, by name (string) or by subflow definition (object).<br/>If it was defined by name in the state definition then the must be been registered previously with registerAction().<br/>If defined by flow definition then start and end of the flow will be mapped to the state.
-
-**Kind**: global typedef  
-**this**: <code>{State}</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| completion | <code>[completion](#completion)</code> | state completion callback |
-
-<a name="completion"></a>
-## completion : <code>function</code>
-State completion callback  available as first argument of [action](#action) or as stateComplete property of [State](State).
-
-**Kind**: global typedef  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| event | <code>string</code> | completion event |
+### Events
+* stateChanged - triggered on any state change
+* state:<stateName> - triggered on specific state change where the <stateName> specify which.
+* flow:entry
+* flow:exit
+* error
 
