@@ -105,14 +105,6 @@ state.specialChars = '$@%@%@%'
   * [stateflow.create(flowSource, name, parent, loader)](#module_stateflow.create)
   * [callback: stateflow~action](#module_stateflow..action)
   * [callback: stateflow~completion](#module_stateflow..completion)
-  * [class: stateflow~State](#module_stateflow..State)
-    * [new stateflow~State(config, name, parent)](#new_module_stateflow..State)
-    * [state.get(name)](#module_stateflow..State#get)
-    * [state.set(name, obj)](#module_stateflow..State#set)
-    * [state.onStateActive(objectOrName, event, listener)](#module_stateflow..State#onStateActive)
-    * [state.onFlowActive(objectOrName, event, listener)](#module_stateflow..State#onFlowActive)
-    * [state.cancelTimeout()](#module_stateflow..State#cancelTimeout)
-    * [state.installTimeout(timeout, handler)](#module_stateflow..State#installTimeout)
   * [class: stateflow~StateFlow](#module_stateflow..StateFlow)
     * [new stateflow~StateFlow(config)](#new_module_stateflow..StateFlow)
     * [stateFlow.start(complete)](#module_stateflow..StateFlow#start)
@@ -135,14 +127,6 @@ state.specialChars = '$@%@%@%'
   * [stateflow.create(flowSource, name, parent, loader)](#module_stateflow.create)
   * [callback: stateflow~action](#module_stateflow..action)
   * [callback: stateflow~completion](#module_stateflow..completion)
-  * [class: stateflow~State](#module_stateflow..State)
-    * [new stateflow~State(config, name, parent)](#new_module_stateflow..State)
-    * [state.get(name)](#module_stateflow..State#get)
-    * [state.set(name, obj)](#module_stateflow..State#set)
-    * [state.onStateActive(objectOrName, event, listener)](#module_stateflow..State#onStateActive)
-    * [state.onFlowActive(objectOrName, event, listener)](#module_stateflow..State#onFlowActive)
-    * [state.cancelTimeout()](#module_stateflow..State#cancelTimeout)
-    * [state.installTimeout(timeout, handler)](#module_stateflow..State#installTimeout)
   * [class: stateflow~StateFlow](#module_stateflow..StateFlow)
     * [new stateflow~StateFlow(config)](#new_module_stateflow..StateFlow)
     * [stateFlow.start(complete)](#module_stateflow..StateFlow#start)
@@ -179,86 +163,6 @@ State completion callback  available as first argument of `action` or as stateCo
 
 **Scope**: inner typedef of [stateflow](#module_stateflow)  
 **Type**: `function`  
-<a name="module_stateflow..State"></a>
-## class: stateflow~State
-**Members**
-
-* [class: stateflow~State](#module_stateflow..State)
-  * [new stateflow~State(config, name, parent)](#new_module_stateflow..State)
-  * [state.get(name)](#module_stateflow..State#get)
-  * [state.set(name, obj)](#module_stateflow..State#set)
-  * [state.onStateActive(objectOrName, event, listener)](#module_stateflow..State#onStateActive)
-  * [state.onFlowActive(objectOrName, event, listener)](#module_stateflow..State#onFlowActive)
-  * [state.cancelTimeout()](#module_stateflow..State#cancelTimeout)
-  * [state.installTimeout(timeout, handler)](#module_stateflow..State#installTimeout)
-
-<a name="new_module_stateflow..State"></a>
-### new stateflow~State(config, name, parent)
-Instance assigned to each state in a flow and bound to the action's this variable.
-
-**Params**
-
-- config <code>[stateDefinition](#stateDefinition)</code> - subflow definition which might contain additional properties.  
-- name `string` - state name.  
-- parent `StateFlow` - flow.  
-
-**Properties**
-
-- active `boolean` - is true when the state is the current state (initial false offcourse).  
-- parent `StateFlow` | `undefined` - only set on subflows and regular states.  
-- config <code>[stateDefinition](#stateDefinition)</code> - state defintion  
-
-**Scope**: inner class of [stateflow](#module_stateflow)  
-<a name="module_stateflow..State#get"></a>
-### state.get(name)
-Get an object value from the current state or it's parents.
-
-**Params**
-
-- name `string` - the object name  
-
-<a name="module_stateflow..State#set"></a>
-### state.set(name, obj)
-Set a property
-
-**Params**
-
-- name `string`  
-- obj `object` | `function` - object or getter function executed on `State#get`  
-
-<a name="module_stateflow..State#onStateActive"></a>
-### state.onStateActive(objectOrName, event, listener)
-Listen to an event on the source (name or object) while the state is active, removed on exit.
-
-**Params**
-
-- objectOrName `object` | `string` - the service name (string) which was registered with set or event emitter instance (object),  
-- event `string` - the event to listen on  
-- listener `callback` | `string` - event listener function or state completion event  
-
-<a name="module_stateflow..State#onFlowActive"></a>
-### state.onFlowActive(objectOrName, event, listener)
-Listen to an event on the source (name or object) while the flow is running, removed when the flow exits.
-
-**Params**
-
-- objectOrName `object` | `string` - object: the source object to listen on, string: the source name retrieved by state.get(name)  
-- event `string` - the event to listen on  
-- listener  - {string|function) string: send state completion event, function: event listener function.  
-
-<a name="module_stateflow..State#cancelTimeout"></a>
-### state.cancelTimeout()
-Cancel the previous installed timeout, always executed when state exits.Can be used within a state action.
-
-<a name="module_stateflow..State#installTimeout"></a>
-### state.installTimeout(timeout, handler)
-Install a state timeout handler fired when the state is active, cancelled on state exit.
-
-**Params**
-
-- timeout `number` | `undefined` - timeout in milliseconds, undefined: reuse the last timeout after the last cancelTimeout()  
-- handler `callback` | `string` | `undefined` - callback: timeout function, string: emit state event on timeout, undefined: reuse the last handler after cancelTimeout()  
-
 <a name="module_stateflow..StateFlow"></a>
 ## class: stateflow~StateFlow
 **Extends**: `State`  

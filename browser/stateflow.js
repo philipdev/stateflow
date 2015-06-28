@@ -1376,6 +1376,10 @@ function removeEventListener(source, event, listener) {
  * @property {boolean} active is true when the state is the current state (initial false offcourse).
  * @property {StateFlow|undefined} parent only set on subflows and regular states.
  * @property {stateDefinition} config state defintion
+ *
+ *
+ * @event State~exit State exit event with the completed state name, at this point the state is no longer active.
+ *
  */
 function State(config, name, parent) {
     var self = this;
@@ -1928,10 +1932,7 @@ StateFlow.prototype.createStateHandler = function (state, stateObj, flowComplete
         var targetState, exitFunction;
         exitFunction = function () {
             completed = true;
-            /** 
-             * State exit event with the completed state name, at this point the state is no longer active.
-             * @event State~exit 
-             */
+
             stateObj.emit('exit', targetState);
             stateObj.active = false;
         };
