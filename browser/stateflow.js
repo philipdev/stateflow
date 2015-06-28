@@ -1980,6 +1980,7 @@ StateFlow.prototype.getStateObject = function (state) {
 };
 
 module.exports.StateFlow = StateFlow;
+module.exports.State = State;
 /**
  * Create a flow from a flow definition language
  * Syntax:
