@@ -1369,6 +1369,7 @@ function removeEventListener(source, event, listener) {
 
 /**
  * Instance assigned to each state in a flow and bound to the action's this variable.
+ * @class State
  * @constructor
  * @param {stateDefinition} config subflow definition which might contain additional properties.
  * @param {string} name state name.
@@ -1423,6 +1424,7 @@ function State(config, name, parent) {
 
 util.inherits(State, EventEmitter);
 /**
+ * @method
  * Get an object value from the current state or it's parents.
  * @param name {string} the object name
  */
@@ -1980,6 +1982,10 @@ StateFlow.prototype.getStateObject = function (state) {
 };
 
 module.exports.StateFlow = StateFlow;
+/**
+ * A state
+ * @type {State}
+ */
 module.exports.State = State;
 /**
  * Create a flow from a flow definition language

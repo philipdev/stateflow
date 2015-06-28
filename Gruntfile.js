@@ -82,7 +82,7 @@ module.exports = function (grunt) {
         }, 
         concat: {
             dist: {
-              src: ['intro.md','usage.md','jsdoc.md'],
+              src: ['intro.md','usage.md','api.md'],
               dest: 'README.md',
             },
         },
