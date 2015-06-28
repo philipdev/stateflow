@@ -1,4 +1,4 @@
-# Usage
+# Example
 ## Javascript
 ```
 var stateflow = require('stateflow');
@@ -44,31 +44,7 @@ c.action {
 
 There is also a browserify version available.
 
- * Include in browser/stateflow.js
- * Use `new stateflow.StateFlow(config)` or `stateflow.create(source)`
+ * Include browser/stateflow.js
+ * Use `new stateflow.StateFlow(config)` or `stateflow.create(source)` to create a flow
 
 
-# Simple flow langauge
-
-```
-// Transtions
-state.event -> other-state
-state.otherEvent -> other-state
-state.'service.event' -> other-state
-// Actions
-//  namedAction registered with flow.registerAction(name, func)
-state.action = namedAction 
-// embedded js function body, also State is bind to this here
-state.action {
-	// function body 
-	this.emit('next');
-}
-// Types
-// begin and end states must have a type (begin, end) 
-state.type = begin
-// Other properties (accessible via state.config.<propertry>)
-state.bool = true
-state.number = 66
-// If a you need to have special characters in our string (double qoutes are also possible)
-state.specialChars = '$@%@%@%'
-```
