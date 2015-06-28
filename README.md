@@ -64,12 +64,6 @@ c.action {
 }
 ```
 
-# Browser
-
-There is also a browserify version available.
-
- * Include browser/stateflow.js
- * Use `new stateflow.StateFlow(config)` or `stateflow.create(source)` to create a flow
 
 
 
@@ -99,7 +93,7 @@ There is also a browserify version available.
 
 A stateflow consists of zero or more statement a statement is terminated either by a newline or semicolon (;) .
 
-*Transitions* is a statement defined in the format *<state>*.*<event>* -> *<targetState>*.
+**Transitions** are statements defined in the format **state**.**eventName** -> **targetStateName**.
 
 `state.event -> target`
 
@@ -108,7 +102,7 @@ and which is not allowed in a literal string.
 
 `state.'myService.event' -> next`
 
-*State properties* is a statement defined in the format *state*.*property* = *value*
+*State properties* is a statement defined in the format **stateName**.**propertyName* = **value**
 ```
 	state.number = 9.9
 	state.action = namedAction
@@ -117,11 +111,11 @@ and which is not allowed in a literal string.
 ```	
 The action property is the action to be executed when the state becomes active.
 
-The *type* property is to specify whether a state is a *begin*, *end* or regular state is, and must be set for begin and end states.
+The **type** property is to specify whether a state is a **begin**, **end** or regular state is, and must be set for begin and end states.
 
 The state maybe be a quoted or a literal string, the property may be a quoted, literal string or number, the value may be a quoted, literal string, number or boolean.
 
-*State function property* is a statement defined in the format *state*.*property* = { }, general used to define actions
+**State function property** is a statement defined in the format **state**.**property** = { }, general used to define actions
 
 
 The state and property have the same restrictions as a regular *State property* then curly brackets enclose a JavaScript function body and are generally used to implement state actions.
@@ -131,13 +125,13 @@ The state and property have the same restrictions as a regular *State property* 
 	}
 ```
 
-*A literal string* is string without quotes out following characters of 0-9, a-Z, @, -, _  
+**A literal string** is string without quotes out following characters of 0-9, a-Z, @, -, _  
 
-*A literal number* a number can have any digit, minus sign and a dot (.)
+**A literal number** a number can have any digit, minus sign and a dot (.)
 
-*A literal boolean* a boolean can be either *true* or *false*
+**A literal boolean** a boolean can be either *true* or *false*
 
-*Quoted strings* can have any characters except the the quotes which it was enclosed in.
+**Quoted strings** can have any characters except the the quotes which it was enclosed in.
 
 ## Create a flow
 Use `var flow = new stateflow.StateFlow(obj);` to create a flow with js object nation.
@@ -150,7 +144,7 @@ StateFlow inherent EventEmitter and thereby have all methods EventEmitter.
 * set(name, service)
 * onStateActive(service, event, listener) - listen for events on the service (name or object) while the state is active (aka automatically removed)
 * onFlowActive(service, event, listener) - listen for events on the service (name or object) while the flow is running
-* installTimeout(timeout, listener) - listener can be a function or an event to be emitted, if the listener or timeout is an integer in milliseconds, if arguments are omitted then the last is used after the last cancelTimeout()
+* installTimeout(timeout, listener) - listener can be a function or an event to be emitted, if arguments are omitted then the last is used after the last cancelTimeout()
 * cancelTimeout() - cancel a previously installed timeout, always executed on state exit
 * stateComplete(event) - try to complete the current state with the specified event.
 
@@ -177,8 +171,14 @@ StateFlow inherent State and thereby have all methods, events and properties of 
 
 ### Events
 * stateChanged - triggered on any state change
-* state:<stateName> - triggered on specific state change where the <stateName> specify which.
+* state:stateName - triggered on specific state change where the stateName specify which.
 * flow:entry
 * flow:exit
 * error
 
+## Browser
+
+There is also a browserify version available.
+
+ * Include browser/stateflow.js
+ * Use `new stateflow.StateFlow(config)` or `stateflow.create(source)` to create a flow

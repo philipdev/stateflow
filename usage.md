@@ -40,11 +40,5 @@ c.action {
 }
 ```
 
-# Browser
-
-There is also a browserify version available.
-
- * Include browser/stateflow.js
- * Use `new stateflow.StateFlow(config)` or `stateflow.create(source)` to create a flow
 
 
