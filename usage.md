@@ -15,7 +15,7 @@ flow.start(function(event) {
 ## Example flow a -> b -> c
 ```
 a.type = begin
-a.action (
+a.action {
 	// regular js function body, where 'this' is the current State object
 	// only the global scope, you must use flow.set('name', obj); for external services
 	this.emit('ignore');

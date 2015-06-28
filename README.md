@@ -39,7 +39,7 @@ flow.start(function(event) {
 ## Example flow a -> b -> c
 ```
 a.type = begin
-a.action (
+a.action {
 	// regular js function body, where 'this' is the current State object
 	// only the global scope, you must use flow.set('name', obj); for external services
 	this.emit('ignore');
@@ -82,7 +82,7 @@ c.action {
 	   destroy: <function>, 
 	   action: <function> | <namedAction> | <js subflow object>	
        on: {
-			<event|service.event>:'<nextState>'
+			<event|service.event>:'<nextState>', ...
 	   }
 	   ... other properties
    }
@@ -93,7 +93,7 @@ c.action {
 
 A stateflow consists of zero or more statement a statement is terminated either by a newline or semicolon (;) .
 
-**Transitions** are statements defined in the format **state**.**eventName** -> **targetStateName**.
+Transitions are statements defined in the format state.eventName -> targetStateName.
 
 `state.event -> target`
 
@@ -102,7 +102,7 @@ and which is not allowed in a literal string.
 
 `state.'myService.event' -> next`
 
-*State properties* is a statement defined in the format **stateName**.**propertyName* = **value**
+State properties is a statement defined in the format stateName.propertyName = value
 ```
 	state.number = 9.9
 	state.action = namedAction
@@ -111,27 +111,27 @@ and which is not allowed in a literal string.
 ```	
 The action property is the action to be executed when the state becomes active.
 
-The **type** property is to specify whether a state is a **begin**, **end** or regular state is, and must be set for begin and end states.
+The type property is to specify whether a state is a begin, end or regular state is, and must be set for begin and end states.
 
 The state maybe be a quoted or a literal string, the property may be a quoted, literal string or number, the value may be a quoted, literal string, number or boolean.
 
-**State function property** is a statement defined in the format **state**.**property** = { }, general used to define actions
+State function property is a statement defined in the format state.property { }, general used to define actions
 
 
-The state and property have the same restrictions as a regular *State property* then curly brackets enclose a JavaScript function body and are generally used to implement state actions.
+The state and property have the same restrictions as a regular State property then curly brackets enclose a JavaScript function body and are generally used to implement state actions.
 ```
 	state.action {
 		this.emit('event');
 	}
 ```
 
-**A literal string** is string without quotes out following characters of 0-9, a-Z, @, -, _  
+A literal string is string without quotes out following characters of 0-9, a-Z, @, -, _  
 
-**A literal number** a number can have any digit, minus sign and a dot (.)
+A literal number a number can have any digit, minus sign and a dot (.)
 
-**A literal boolean** a boolean can be either *true* or *false*
+A literal boolean a boolean can be either *true* or *false*
 
-**Quoted strings** can have any characters except the the quotes which it was enclosed in.
+Quoted strings can have any characters except the the quotes which it was enclosed in.
 
 ## Create a flow
 Use `var flow = new stateflow.StateFlow(obj);` to create a flow with js object nation.
