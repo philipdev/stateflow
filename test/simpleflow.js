@@ -59,13 +59,18 @@ describe('StateFlow', function () {
         it('flow must signal state:nextState even when the state is already currentState', function (done) {
             var flow = new StateFlow(flowDefinition);
             flow.registerAction('endAction', function (next) {
-                flow.on('state:nextState', function () {
-                    next('done');
-                    done();
-                });
+                next('done');
+
             });
             flow.start(function (event) {
                 assert.equal('done', event);
+
+
+                flow.on('state:nextState', function () {
+                 //   console.trace('nextState');
+                    done();
+                });
+
             });
         });
 
@@ -137,6 +142,9 @@ describe('StateFlow', function () {
 
         it('onStateActive, listens only when active, completion event when listener is a string', function (done) {
             var flow = new StateFlow(flowDefinition), emitter = new EventEmitter();
+            flow.on('error', function(e) {
+               console.trace(e);
+            });
             flow.set('emitter', emitter);
             flow.registerAction('endAction', function () {
                 assert.equal(emitter, this.get('emitter'));

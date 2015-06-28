@@ -1413,9 +1413,8 @@ function State(config, name, parent) {
     }
 
     this.timeout = 0;
-
-
     this.listeners = [];
+
 }
 
 util.inherits(State, EventEmitter);
@@ -1746,7 +1745,8 @@ StateFlow.prototype.getAction = function (state) {
     if (typeof def.action === 'object') {
         return this.createSubFlowAction();
     }
-    throw new Error("No action found for state '" + state + "'");
+    // this makes action optional!
+    return undefined;
 };
 
 
@@ -1758,6 +1758,7 @@ StateFlow.prototype.getAction = function (state) {
 StateFlow.prototype.createSubFlowAction = function () {
     return function (complete) {
         // action is executed State object assigned to this in this case StateFlow
+        // TODO: forward error
         this.start(function (event) {
             complete(event);
         }, true);
@@ -1811,10 +1812,12 @@ StateFlow.prototype.findStatesByType = function (type) {
  * @private
  */
 StateFlow.prototype.go = function (state, complete) {
-    var stateDefinition = this.config[state], stateObj, action;
+    var stateDefinition = this.config[state], stateObj, action, oldState;
 
     if (stateDefinition === undefined) {
-        throw new Error("No state defination found for state '" + state + "'");
+        var error = new Error("No state defination found for state '" + state + "'");
+        error.code = 'stateNotFound';
+        throw error;
     }
 
     stateObj = this.getStateObject(state);
@@ -1828,10 +1831,9 @@ StateFlow.prototype.go = function (state, complete) {
       * @this {State}
       */
     action = this.getAction(state);
-    if (action === undefined) {
-        throw new Error(state + '.action' + ' is undefined');
-    }
+
     stateObj.active = true;
+    oldState = this.currentState;
     this.currentState = state;
     stateObj.stateComplete = this.createStateHandler(state, stateObj, complete);
     this.forwardEvents(stateObj, stateDefinition.on);
@@ -1840,13 +1842,43 @@ StateFlow.prototype.go = function (state, complete) {
      * @event State~entry 
      */
     stateObj.emit('entry', state);
-     /** 
-      * Event fired when a specific stateName state has been reached, if new listener is added with an state:stateName which is already
-      * current then the event will also be fired (stateName must must be replaced with an actual state).
-      * @event StateFlow~state:stateName 
-      */
+    /**
+     * Event fired when a specific stateName state has been reached, if new listener is added with an state:stateName which is already
+     * current then the event will also be fired (stateName must must be replaced with an actual state).
+     * @event StateFlow~state:stateName
+     */
     this.emit('state:' + state);
-    action.call(stateObj, stateObj.stateComplete);
+    /**
+     * Emitted for every state change,
+     * @param state {string} new state
+     * @param oldState {string} previous state
+     * @event StateFlow~stateChanged
+     */
+    this.emit('stateChanged', state, oldState);
+
+    try {
+       if(action !== undefined) {
+           action.call(stateObj, stateObj.stateComplete);
+       } else if(stateDefinition.type === 'end') {
+           stateObj.stateComplete('end');
+       }
+    } catch(e) {
+        var errorHandled = false;
+        if(typeof e ==='object' && typeof e.code === 'string' ) {
+            errorHandled = stateObj.stateComplete(e.code);
+            console.log('error in state', state, e); // otherwize: error information lost!
+        }
+        if(!errorHandled) {
+            errorHandled = stateObj.stateComplete('exception');
+            console.log('error in state', state, e); // otherwize: error information lost!
+        }
+
+        if(!errorHandled) {
+            console.log('error in state', state, e);
+            this.emit('error', e);
+        }
+    }
+
 };
 
 StateFlow.prototype.forwardEvents = function (stateObject, on, complete) {
@@ -1907,6 +1939,7 @@ StateFlow.prototype.createStateHandler = function (state, stateObj, flowComplete
             if (stateDefinition.type === 'end') {
                 exitFunction();
                 flowCompleted(event);
+                completed = true;
             } else if (typeof stateDefinition.on === 'object' && stateDefinition.on[event]) {
                 targetState = stateDefinition.on[event];
             } else if (typeof stateDefinition.on === 'object' && stateDefinition.on['*']) {
@@ -1915,10 +1948,12 @@ StateFlow.prototype.createStateHandler = function (state, stateObj, flowComplete
             if (targetState) {
                 exitFunction();
                 self.go(targetState, flowCompleted);
+                completed = true;
             }
         } else {
             console.error("State '" + state + "' already completed!");
         }
+        return completed;
     };
 
     return stateCompletion;

@@ -18,7 +18,7 @@ timeout.action {
     this.installTimeout(100, 'next');
 }
 
-timeout.next -> end
+timeout.* -> end
 
 
 end.action {

@@ -1,0 +1,3 @@
+start.type = begin
+start.'service.next' -> end
+end.type = end
