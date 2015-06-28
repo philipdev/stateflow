@@ -1319,9 +1319,7 @@ module.exports = parse;
 },{"./generatedParser.js":1,"fs":4,"pegjs":19}],3:[function(require,module,exports){
 /*jslint node: true */
 'use strict';
-/**
- * @module stateflow
- */
+
 var util = require('util');
 var parser = require('./parser');
 var EventEmitter = require('events').EventEmitter;
@@ -1369,17 +1367,13 @@ function removeEventListener(source, event, listener) {
 
 /**
  * Instance assigned to each state in a flow and bound to the action's this variable.
- * @class State
- * @constructor
+ * @constructor State
  * @param {stateDefinition} config subflow definition which might contain additional properties.
  * @param {string} name state name.
  * @param {StateFlow} parent flow.
  * @property {boolean} active is true when the state is the current state (initial false offcourse).
  * @property {StateFlow|undefined} parent only set on subflows and regular states.
  * @property {stateDefinition} config state defintion
- *
- *
- * @event State~exit State exit event with the completed state name, at this point the state is no longer active.
  *
  */
 function State(config, name, parent) {
@@ -1597,6 +1591,7 @@ State.prototype.installTimeout = function (timeout, handler) {
  *     if(event !== 'done') throw new Error('event must be done, as in nextState');
  * });
  * </pre>
+ * @exports stateflow.StateFlow
  * @extends State
  * @constructor
  * @param config {flowDefinition} flow definition
@@ -1605,7 +1600,7 @@ State.prototype.installTimeout = function (timeout, handler) {
  */
 function StateFlow(config, name, parent) {
     /**
-     * @typedef StateFlow~flowDefinition {object} where the key is the state and the value a {@link stateDefinition}
+     * @typedef flowDefinition {object} where the key is the state and the value a {@link stateDefinition}
      */
     State.call(this, config, name, parent);
     this.actions = {};
@@ -1845,20 +1840,20 @@ StateFlow.prototype.go = function (state, complete) {
     this.forwardEvents(stateObj, stateDefinition.on);
     /** 
      * State entry event fired just before a state action is called
-     * @event State~entry 
+     * @event module:stateflow.event:entry
      */
     stateObj.emit('entry', state);
     /**
      * Event fired when a specific stateName state has been reached, if new listener is added with an state:stateName which is already
      * current then the event will also be fired (stateName must must be replaced with an actual state).
-     * @event StateFlow~state:stateName
+     * @event state:stateName
      */
     this.emit('state:' + state);
     /**
      * Emitted for every state change,
      * @param state {string} new state
      * @param oldState {string} previous state
-     * @event StateFlow~stateChanged
+     * @event stateChanged
      */
     this.emit('stateChanged', state, oldState);
 
@@ -1934,7 +1929,9 @@ StateFlow.prototype.createStateHandler = function (state, stateObj, flowComplete
         var targetState, exitFunction;
         exitFunction = function () {
             completed = true;
-
+            /**
+             * @event exit State exit event with the completed state name, at this point the state is no longer active.
+             */
             stateObj.emit('exit', targetState);
             stateObj.active = false;
         };
@@ -1982,10 +1979,6 @@ StateFlow.prototype.getStateObject = function (state) {
 };
 
 module.exports.StateFlow = StateFlow;
-/**
- * A state
- * @type {State}
- */
 module.exports.State = State;
 /**
  * Create a flow from a flow definition language

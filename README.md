@@ -123,7 +123,7 @@ state.specialChars = '$@%@%@%'
 
 A stateflow consists of zero or more statement a statement is terminated either by a newline or semicolon (;) .
 
-'''Transitions''' is a statement defined in the format '''<state>'''.'''<event>''' -> '''<targetState>'''.
+*Transitions* is a statement defined in the format *<state>*.*<event>* -> *<targetState>*.
 
 `state.event -> target`
 
@@ -132,7 +132,7 @@ and which is not allowed in a literal string.
 
 `state.'myService.event' -> next`
 
-'''State properties''' is a statement defined in the format '''state'''.'''property''' = '''value'''
+*State properties* is a statement defined in the format *state*.*property* = *value*
 ```
 	state.number = 9.9
 	state.action = namedAction
@@ -141,27 +141,27 @@ and which is not allowed in a literal string.
 ```	
 The action property is the action to be executed when the state becomes active.
 
-The '''type''' property is to specify whether a state is a '''begin''', '''end''' or regular state is, and must be set for begin and end states.
+The *type* property is to specify whether a state is a *begin*, *end* or regular state is, and must be set for begin and end states.
 
 The state maybe be a quoted or a literal string, the property may be a quoted, literal string or number, the value may be a quoted, literal string, number or boolean.
 
-'''State function property''' is a statement defined in the format '''state'''.'''property''' = { }, general used to define actions
+*State function property* is a statement defined in the format *state*.*property* = { }, general used to define actions
 
 
-The state and property have the same restrictions as a regular '''State property''' then curly brackets enclose a JavaScript function body and are generally used to implement state actions.
+The state and property have the same restrictions as a regular *State property* then curly brackets enclose a JavaScript function body and are generally used to implement state actions.
 ```
 	state.action {
 		this.emit('event');
 	}
 ```
 
-'''A literal string''' is string without quotes out following characters of 0-9, a-Z, @, -, _  
+*A literal string* is string without quotes out following characters of 0-9, a-Z, @, -, _  
 
-'''A literal number''' a number can have any digit, minus sign and a dot (.)
+*A literal number* a number can have any digit, minus sign and a dot (.)
 
-'''A literal boolean''' a boolean can be either '''true''' or '''false'''
+*A literal boolean* a boolean can be either *true* or *false*
 
-'''Quoted strings''' can have any characters except the the quotes which it was enclosed in.
+*Quoted strings* can have any characters except the the quotes which it was enclosed in.
 
 ## Create a flow
 Use `var flow = new stateflow.StateFlow(obj);` to create a flow with js object nation.
@@ -186,7 +186,7 @@ StateFlow inherent EventEmitter and thereby have all methods EventEmitter.
 ### Events
 * entry
 * exit
-* <errorCode> - when an exception thrown by the state action, will try to complete the state with the '''code''' property of the error (if exists).
+* an errorCode - when an exception thrown by the state action, will try to complete the state with the *code* property of the error (if exists).
 * exception - when exception was thrown in the state action and no handler was found with then the exception event is emitted, if there is no handler for that then the error is emitted on the flow.
 
 ## StateFlow
