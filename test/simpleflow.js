@@ -82,7 +82,7 @@ describe('StateFlow', function () {
             });
             flow.registerAction('endAction', function () {
                 assert.equal('myDataValue', this.get('myData'));
-                assert.equal('myDataFuncValue', this.get('myDataFunc'));
+                assert.equal('myDataFuncValue', this.get('myDataFunc')());
                 done();
                 this.stateComplete('done');
             });
@@ -99,7 +99,7 @@ describe('StateFlow', function () {
             });
             flow.registerAction('endAction', function () {
                 assert.equal('myDataValue', this.get('myData'));
-                assert.equal('myDataFuncValue', this.get('myDataFunc'));
+                assert.equal('myDataFuncValue', this.get('myDataFunc')());
                 this.stateComplete('done');
             });
             flow.start(function (event) {
@@ -142,9 +142,7 @@ describe('StateFlow', function () {
 
         it('onStateActive, listens only when active, completion event when listener is a string', function (done) {
             var flow = new StateFlow(flowDefinition), emitter = new EventEmitter();
-            flow.on('error', function(e) {
-               console.trace(e);
-            });
+
             flow.set('emitter', emitter);
             flow.registerAction('endAction', function () {
                 assert.equal(emitter, this.get('emitter'));
@@ -254,14 +252,14 @@ describe('StateFlow', function () {
                         this.emit('done');
                     },
                     on: {
-                        'done':undefined
+                        'done':'newEvent'
                     }
                 }
             };
 
             var flow = new StateFlow(myFlowDefinition);
             flow.on('flow:exit', function(event) {
-                assert.equal('done', event);
+                assert.equal('newEvent', event);
                 done();
             }); // want use the same entry, exit event names for both state flow
 

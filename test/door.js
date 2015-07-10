@@ -46,7 +46,7 @@ Door.prototype.open = function (cb) {
         this.setStatus('openeing');
         this.changeStatus('open', cb);
     } else {
-        console.trace('Can not open door');
+        //console.trace('Can not open door');
         cb(new Error('Can not open door'));
     }
 };
@@ -56,7 +56,7 @@ Door.prototype.close = function(cb) {
         this.setStatus('closing');
         this.changeStatus('closed', cb);
     } else {
-        console.trace('Can not close door');
+        //console.trace('Can not close door');
         cb(new Error('Can not close door'));
     }
 };
@@ -66,7 +66,7 @@ Door.prototype.lock = function(cb) {
         this.setLockStatus('locking');
         this.changeLockStatus('locked');
     } else {
-        console.trace('Can not lock door');
+        //console.trace('Can not lock door');
         cb(new Error('Can not lock door'));
     }
 };
@@ -76,7 +76,7 @@ Door.prototype.unlock = function(cb) {
         this.setLockStatus('unlocking');
         this.changeLockStatus('unlocked');
     } else {
-        console.trace('Can not unlock door');
+        //console.trace('Can not unlock door');
         cb(new Error('Can not unlock door'));
     }
 };
@@ -88,7 +88,7 @@ describe('Door', function () {
         'begin': {
             type: 'begin',
             action: function(complete){
-                console.error('begin');
+                //console.error('begin');
                 var door = this.get('door'); 
                 if(door.status === 'open' || door.status === 'opening') {
                     complete('done');
@@ -105,13 +105,13 @@ describe('Door', function () {
         },
         'unlockDoor': {
             action: function (complete) {
-                console.error('unlockDoor');
+                //console.error('unlockDoor');
                 var door = this.get('door');
                 //this.installTimeout(1000, 'timeout');
                 function unlock() {
                     door.unlock( function (error) {
                         if(error) {
-                            console.trace('unlock error');
+                            //console.trace('unlock error');
                             complete('error');
                         }
                     });
@@ -130,12 +130,12 @@ describe('Door', function () {
         'openDoor' : {
             
             action: function (complete) {
-                console.error('openDoor');
+                //console.error('openDoor');
                 var door = this.get('door');
                 function open() {
                     door.open(function (error) {
                         if(error) {
-                            console.trace('openDoor', 'door open failed!', error);
+                            //console.trace('openDoor', 'door open failed!', error);
                             complete(error);
                         }
                     });
@@ -143,7 +143,7 @@ describe('Door', function () {
                 if(door.status === 'open') {
                     complete('doorOpen');
                 } else if(door.lockStatus === 'locked' || door.lockStatus === 'locking') {
-                    console.trace('openDoor', 'door still locked!');
+                    //console.trace('openDoor', 'door still locked!');
                     complete('error');
                 } else {
                     if(door.status === 'closed') {
@@ -184,7 +184,7 @@ describe('Door', function () {
             
             var door = new Door('closed','locked');
             function logStatus () {
-                console.log('door', door.status, door.lockStatus);
+                //console.log('door', door.status, door.lockStatus);
             }
             door.on('open', logStatus);
             door.on('opening', logStatus);

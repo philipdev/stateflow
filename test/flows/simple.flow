@@ -22,7 +22,7 @@ timeout.* -> end
 
 
 end.action {
-    console.log('finish');
+   // console.log('finish');
     this.stateComplete('finish');
 }
 end.type = end

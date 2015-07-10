@@ -1,0 +1,26 @@
+start.type = begin
+start.action {
+    this.emit('next');
+}
+start.next -> exception
+exception.action {
+    // emits an error on the currentState and stays there
+    //console.log('throw error');
+    throw new Error('error in flow');
+
+}
+
+exception.exception -> myError
+
+myError.action {
+    var error = new Error('error');
+    error.code = 'myError'
+    throw error;
+}
+
+myError.myError -> generic
+generic.action {
+    throw new Error('catch all handler');
+}
+generic.* -> end
+end.type = end

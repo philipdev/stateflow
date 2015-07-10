@@ -1,0 +1,34 @@
+{
+  "home": {
+    "type": "begin",
+    "on": {
+      "page.list": "list",
+      "details": "details",
+      "page.checkout": "checkout"
+    }
+  },
+  "list": {
+    "on": {
+      "page.details": "details",
+      "page.checkout": "checkout",
+      "page.home": "home",
+      "timeout": "home"
+    }
+  },
+  "details": {
+    "on": {
+      "page.checkout": "checkout",
+      "page.home": "home",
+      "page.list": "list",
+      "timeout": "home"
+    }
+  },
+  "checkout": {
+    "action": "checkout",
+    "on": {
+      "cancel": "home",
+      "continue": "list",
+      "finish": "home"
+    }
+  }
+}

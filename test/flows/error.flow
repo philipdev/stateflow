@@ -5,6 +5,6 @@ start.action {
 start.next -> next
 next.action {
     // emits an error on the currentState and stays there
-    console.log('throw error');
+    //console.log('throw error');
     throw new Error('error in flow');
 }

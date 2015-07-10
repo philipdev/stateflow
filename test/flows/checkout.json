@@ -1,0 +1,45 @@
+{
+  "overview": {
+    "type": "begin",
+    "on": {
+      "page.cancel": "cancelOrder",
+      "page.more": "continueShopping",
+      "page.proceed": "enterDetails"
+    }
+  },
+  "enterDetails": {
+    "page": "pages/orderCustomerDetails.html",
+    "action": "setPage",
+    "on": {
+      "page.back": "overview",
+      "page.proceed": "confirm",
+      "page.cancel": "cancelOrder",
+      "page.more": "continueShopping"
+    }
+  },
+  "confirm": {
+    "page": "pages/orderConfirm.html",
+    "action": "setPage",
+    "on": {
+      "page.back": "enterDetails",
+      "page.confirm": "showResults",
+      "page.cancel": "cancelOrder"
+    }
+  },
+  "showResults": {
+    "page": "pages/orderResult.html",
+    "action": "setPage",
+    "on": {
+      "page.finish": "finish"
+    }
+  },
+  "continueShopping": {
+    "type": "end"
+  },
+  "cancelOrder": {
+    "type": "end"
+  },
+  "finish": {
+    "type": "end"
+  }
+}

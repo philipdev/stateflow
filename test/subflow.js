@@ -9,7 +9,6 @@ function createAction(event, waitFor) {
     return function (complete) {
         if (waitFor) {
             waitFor.once('continue', function (data) {
-                console.log('continue');
                 complete(data);
             });
             waitFor.emit(event);
@@ -52,8 +51,6 @@ describe('StateFlow subflows', function () {
                 
                 emitter.emit('continue', 'again');
             });
-            
-            
             
             flow.start(function (event) {
                 assert.equal('ok', event);
