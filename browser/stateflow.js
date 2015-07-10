@@ -1290,7 +1290,7 @@ function getState(flow, name) {
 /**
  * Creates a flow definition object from a simple flow language which can be passed to the StateFlow constructor
  */
-var parse = function(src, loader) { // we might need caching
+var parse = function(src) { // we might need caching
 
         var obj = {}, parserResult = parser.parse(src);
         // Figure out if i can move this to the parser, because i want to reuse this logic
@@ -1299,13 +1299,7 @@ var parse = function(src, loader) { // we might need caching
             if (row.type === 'event') {
                 getState(obj, row.from).on[row.on] = row.to;
             } else if (row.type === 'property') {
-                if (row.property === 'action' && row.value.indexOf('@') === 0 && typeof loader === 'function') {
-                    // action starts with @, then we load the subflow
-                    getState(obj, row.state)[row.property] = parse(loader(row.value.substring(1)));
-                } else {
-                    getState(obj, row.state)[row.property] = row.value;
-                }
-
+                getState(obj, row.state)[row.property] = row.value;
             } else if (row.type === 'function') {
                 // this is really cool!, only real downside is the parser might throw unclear errors when the blocks are not balanced!
                 /*jslint evil: true */
@@ -1315,7 +1309,40 @@ var parse = function(src, loader) { // we might need caching
 
     return obj;
 };
+
+function loadSubs(flowConfig, loader, remaining, cb) {
+    if(remaining.length > 0) {
+        var state = flowConfig[remaining.shift()];
+        var resource = state.action.substring(1);
+        load(resource, loader, function(err, config) {
+            if(err) {
+                cb(err);
+            } else {
+                state.action = config;
+                loadSubs(flowConfig, loader, remaining, cb); // aka next
+            }
+        });
+    } else {
+        cb(undefined, flowConfig);
+    }
+}
+var load = function(resource, loader, cb) {
+    loader(resource, function(err, result){
+        if(err) {
+            cb(err);
+        } else {
+            var flowConfig = parse(result);
+            var remaining = Object.keys(flowConfig).filter(function (stateName) {
+                return typeof this[stateName].action === 'string' && this[stateName].action.indexOf('@') === 0;
+            }, flowConfig);
+            loadSubs(flowConfig, loader, remaining, cb);
+        }
+    });
+};
+
 module.exports = parse;
+module.exports.load = load;
+
 },{"./generatedParser.js":1,"fs":4,"pegjs":19}],3:[function(require,module,exports){
 /*jslint node: true */
 'use strict';
@@ -1429,9 +1456,11 @@ State.prototype.get = function (name) {
     } else if (this.parent) {
         value = this.parent.get(name);
     }
+    /* was not so a good idea, obviously since passing around functions is kind of normal
     if (typeof value === 'function') {
         return value();
     }
+    */
     return value;
 };
 
@@ -1867,15 +1896,15 @@ StateFlow.prototype.go = function (state, complete) {
         var errorHandled = false;
         if(typeof e ==='object' && typeof e.code === 'string' ) {
             errorHandled = stateObj.stateComplete(e.code);
-            console.log('error in state', state, e); // otherwize: error information lost!
+            //console.log('error in state', state, e); // otherwize: error information lost!
         }
         if(!errorHandled) {
             errorHandled = stateObj.stateComplete('exception');
-            console.log('error in state', state, e); // otherwize: error information lost!
+            //console.log('error in state', state, e); // otherwize: error information lost!
         }
 
         if(!errorHandled) {
-            console.log('error in state', state, e);
+            //console.log('error in state', state, e);
             this.emit('error', e);
         }
     }
@@ -1887,6 +1916,8 @@ StateFlow.prototype.forwardEvents = function (stateObject, on, complete) {
     if (typeof on === 'object') {
         forwardEvents = Object.keys(on);
     }
+
+
 
     forwardEvents.forEach(function (key) {
         var serviceAndEvent;
@@ -1902,6 +1933,14 @@ StateFlow.prototype.forwardEvents = function (stateObject, on, complete) {
             this.stateComplete(key); // when the service.event appears, emit it agian as service.event event!
         });
     }, this);
+    if ( EventEmitter.listenerCount(stateObject, 'event') === 0 && stateObject.parent ) {
+        // Forward errors to the parent
+        // TODO: TEST THIS, NOTE COULD ALSO DOMAIN FOR THIS
+        // NOTE: this will only catch error while the state is active, not if some delayed callback of a finished state comes back with an error
+        stateObject.onStateActive(stateObject, 'error', function (e) {
+            stateObject.parent.emit('error', e, stateObject);
+        });
+    }
 };
 
 /**
@@ -1938,11 +1977,17 @@ StateFlow.prototype.createStateHandler = function (state, stateObj, flowComplete
         if (!completed) {
             if (stateDefinition.type === 'end') {
                 exitFunction();
-                flowCompleted(event);
+                if(typeof stateDefinition.on === 'object' && typeof stateDefinition.on[event] === 'string') {
+                    // use the on mapping for end of flow event translation
+                    flowCompleted(stateDefinition.on[event]);
+                } else {
+                    flowCompleted(event);
+                }
+
                 completed = true;
-            } else if (typeof stateDefinition.on === 'object' && stateDefinition.on[event]) {
+            } else if (typeof stateDefinition.on === 'object' && typeof stateDefinition.on[event] === 'string') {
                 targetState = stateDefinition.on[event];
-            } else if (typeof stateDefinition.on === 'object' && stateDefinition.on['*']) {
+            } else if (typeof stateDefinition.on === 'object' && stateDefinition.on['*']) { // thinking of removing wildcard matches, since EventEmitter doesn't have a catch all
                 targetState = stateDefinition.on['*'];
             }
             if (targetState) {
@@ -1950,8 +1995,6 @@ StateFlow.prototype.createStateHandler = function (state, stateObj, flowComplete
                 self.go(targetState, flowCompleted);
                 completed = true;
             }
-        } else {
-            console.error("State '" + state + "' already completed!");
         }
         return completed;
     };
@@ -2000,6 +2043,19 @@ module.exports.create = function(flowSource, name, parent, loader) {
     var def = parser(flowSource);
 
     return new StateFlow(def, name, parent);
+};
+
+/**
+ * Load a flow and it's subflows
+ * @param resource the name of the flow to load
+ * @param loader  the loader which actually loads the name as a string, has to paramers the resource to load and the callback, the first argument is error or undefined and the second is the source string
+ * @param cb
+ */
+module.exports.load = function(resource, loader, cb) {
+    parser.load(resource, loader, function(err, config){
+        var flow = config !== undefined ? new StateFlow(config) : undefined;
+        cb(err, flow);
+    });
 };
 },{"./parser":2,"events":5,"util":9}],4:[function(require,module,exports){
 
