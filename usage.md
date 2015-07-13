@@ -35,9 +35,11 @@ b.other -> a
 
 c.type = end
 c.action {
-	// can't use emit here, since there is no event mapping on end states.
-	this.stateComplete('finish');
+	this.emit('finish');	
 }
+// event mapping on end stated is used to map to flow exit event
+c.finish -> finish 
+
 ```
 
 

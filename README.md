@@ -59,9 +59,11 @@ b.other -> a
 
 c.type = end
 c.action {
-	// can't use emit here, since there is no event mapping on end states.
-	this.stateComplete('finish');
+	this.emit('finish');	
 }
+// event mapping on end stated is used to map to flow exit event
+c.finish -> finish 
+
 ```
 
 
@@ -137,16 +139,44 @@ Quoted strings can have any characters except the the quotes which it was enclos
 Use `var flow = new stateflow.StateFlow(obj);` to create a flow with js object nation.
 
 Use `var flow = stateflow.create(flowLanguage)` to create a flow with the flow language
+
+Use `stateflow.load(name, loader, loadedCallback)` to load a flow from a resource and subflows (named action which start with the @ sign).
+* loader signature: function(resource, resultCallback) where the signature of the resultCallback is function(err, sourceText)
+* loadedCallback: signature: function(err, flow)
+
 ## State 
-StateFlow inherent EventEmitter and thereby have all methods EventEmitter.
+State extends EventEmitter.
 ### Methods
-* get(name) - get a service from the current state or parent(s), bottom to top.
-* set(name, service)
-* onStateActive(service, event, listener) - listen for events on the service (name or object) while the state is active (aka automatically removed)
-* onFlowActive(service, event, listener) - listen for events on the service (name or object) while the flow is running
-* installTimeout(timeout, listener) - listener can be a function or an event to be emitted, if arguments are omitted then the last is used after the last cancelTimeout()
-* cancelTimeout() - cancel a previously installed timeout, always executed on state exit
-* stateComplete(event) - try to complete the current state with the specified event.
+
+#### get(name)
+Get a service from the current state or parent(s), bottom up.
+
+#### set(name, service)
+Set a service
+
+#### onStateActive(service, event, listener) 
+Listen for events on the service (name or object) while the state is active (aka automatically removed when the state exits)
+
+* service: name or service object
+* event: event to listen for
+* listener: listener function or event string to fire
+
+#### onFlowActive(service, event, listener) 
+Listen for events on the service (name or object) while the flow is running
+* service : name or service object
+* event : event to listen for
+* listener: listener function or event string to fire
+
+#### installTimeout(timeout, listener) 
+Install a state timeout
+* timeout: timeout in millseconds (if omitted the last one before cancelTimeout() is called
+* listener: listener  function or event to fire on timeout, if omitted then the last is used after the last cancelTimeout()
+
+#### cancelTimeout() 
+Cancel a previously installed timeout, always executed on state exit
+
+#### stateComplete(event)
+Try to complete the current state with the specified event.
 
 ### Properties
 * active - true or false indicating if the state is active
@@ -160,11 +190,27 @@ StateFlow inherent EventEmitter and thereby have all methods EventEmitter.
 * exception - when exception was thrown in the state action and no handler was found with then the exception event is emitted, if there is no handler for that then the error is emitted on the flow.
 
 ## StateFlow
-StateFlow inherent State and thereby have all methods, events and properties of State.
+StateFlow extends State
 ### Methods
-* start(callback) - execute the flow and call the callback when finished. the event is passed as 
-* getStateObject(statName)
-* registerAction(name, action, initializer, desctructor) - name is a stirng, action can be a function or a js object subflow, initializer and destructors are optional functions.
+#### start(callback)
+Execute the flow and call the callback when finished. the event is passed as first argument.
+* callback signature function(event) 
+
+#### getStateObject(statName)
+Get the state instance object
+
+#### registerAction(name, action, initializer, destructor)
+Register an action which can be referenced by state action defined as string
+* name is a string
+* action can be a function or a js object subflow, initializer and destructors are optional functions.
+* intializer is a function called when the flow starts (optional)
+* destructor is a function called when the flow exits (optional)
+
+#### addStateDecorator(callback)
+Add state decorator which is called just after a state or subflow is created, used to add methods and properties to states,
+a subflow inherent all decorators from it's parent flow.
+ 
+* callback signature: function(state)
 
 ### Properties
 * currentState
