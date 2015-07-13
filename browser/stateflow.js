@@ -1290,7 +1290,7 @@ function getState(flow, name) {
 /**
  * Creates a flow definition object from a simple flow language which can be passed to the StateFlow constructor
  */
-var parse = function(src) { // we might need caching
+var parse = function(src, ref) { // we might need caching
 
         var obj = {}, parserResult = parser.parse(src);
         // Figure out if i can move this to the parser, because i want to reuse this logic
@@ -1303,7 +1303,11 @@ var parse = function(src) { // we might need caching
             } else if (row.type === 'function') {
                 // this is really cool!, only real downside is the parser might throw unclear errors when the blocks are not balanced!
                 /*jslint evil: true */
-                getState(obj, row.state)[row.property] = new Function(['complete'], row.body);
+                var sourceURL = "";
+                if(ref) {
+                    sourceURL = '//# sourceURL='+ref + '#' + row.state + '.' + row.property  + '\n';
+                }
+                getState(obj, row.state)[row.property] = new Function(['complete'], row.body + '\n' + sourceURL);
             }
         });
 
@@ -1328,10 +1332,23 @@ function loadSubs(flowConfig, loader, remaining, cb) {
 }
 var load = function(resource, loader, cb) {
     loader(resource, function(err, result){
+        var flowConfig;
         if(err) {
             cb(err);
         } else {
-            var flowConfig = parse(result);
+            try {
+                flowConfig = parse(result, resource);
+            } catch(e) {
+                var line, lineNo = e.line, lines = result.split("\n");
+                if(lineNo > 0) {
+                    line = lines[lineNo - 1];
+                } else {
+                    lineNo = 'unknown';
+                    line = '';
+                }
+                
+                throw new Error('parse error in ' + resource + ' at line ' + lineNo + ' : ' + line );
+            }
             var remaining = Object.keys(flowConfig).filter(function (stateName) {
                 return typeof this[stateName].action === 'string' && this[stateName].action.indexOf('@') === 0;
             }, flowConfig);
@@ -2001,6 +2018,35 @@ StateFlow.prototype.createStateHandler = function (state, stateObj, flowComplete
 
     return stateCompletion;
 };
+/**
+ * Add a decorator, a decorator is function who is called on state creation, used to provide flow wide properties and methods.
+ * Note it will not decorate itself (root flow), if this is desired the caller can always do flow.decorateState(flow); 
+ * Decorators must be set before the flow is started
+ * @param decoratorFunc {function(state)}
+ */
+StateFlow.prototype.addStateDecorator = function(decoratorFunc) {
+    if(typeof decoratorFunc !== 'function') {
+        throw new Error('decorator must be a function!');
+    } else {
+        if(!this._decorators) {
+            this._decorators = [];
+        }
+        this._decorators.push(decoratorFunc);
+    } 
+};
+
+StateFlow.prototype.decorateState = function(state) {
+    if(this.parent) {
+        this.parent.decorateState(state);
+    }
+    if(this._decorators) {
+        // decorate in reverse order
+        this._decorators.forEach(function(decorate) {
+            decorate(state);
+        });
+    }
+};
+
 
 /**
  * Get the state instance object also associated with the state action this.
@@ -2017,6 +2063,7 @@ StateFlow.prototype.getStateObject = function (state) {
         } else {
             this.states[state] = new State(this.config[state], state, this);
         }
+        this.decorateState(this.states[state]);
     }
     return this.states[state];
 };
