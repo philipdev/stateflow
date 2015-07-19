@@ -4,12 +4,14 @@
 {
 
 }
-start = (comment/functionProperty/property/event/ignoreSpace)*
+start = (comment/functionProperty/property/event/directEvent/ignoreSpace)*
 
+directEvent = whitespace from:name whitespace '->' whitespace to:name  terminator {
+    return {type:'event', from: from, to:to, on: ''};
+}
 
-event    = whitespace from:name whitespace on:(propertyNameLiteral / propertyNameLookup ) whitespace '->' whitespace to:name  terminator {
+event  = whitespace from:name whitespace on:(propertyNameLiteral / propertyNameLookup ) whitespace '->' whitespace to:name  terminator {
     return {type:'event', from: from, to:to, on: on};
-
 }
 
 property = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup )  '=' whitespace value:value terminator {

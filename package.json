@@ -1,7 +1,7 @@
 {
   "name": "stateflow",
   "version": "0.6.0",
-  "description": "async state flow engine",
+  "description": "event driven async flow engine",
   "main": "./lib/stateflow.js",
   "private": false,
   "author": "Philip Van Bogaert",
@@ -11,7 +11,8 @@
     "state",
     "machine",
     "async",
-    "declarative"
+    "declarative",
+	"event"
   ],
   "repository": {
     "type": "git",

@@ -197,6 +197,31 @@ describe('StateFlow', function () {
             emitter.emit('myEvent');
             emitter.emit('myEvent'); // this must be ignored!
         });
+        it('Direct end, end state with empty event must terminate with the matched event', function (done) {
+            var myFlowDefinition = {
+                beginState: {
+                    type: 'begin',
+                    action: function (complete) {
+                        this.emit('next');
+                    },
+                    on: {
+                        'next': 'nextState'
+                    }
+                },
+                nextState: {
+                    type: 'end',
+                    on: {
+                        '':'finish'
+                    }
+                }
+            };
+            var flow = new StateFlow(myFlowDefinition);
+            flow.start(function (event) {
+                assert.equal('finish', event);
+                done();
+            });
+
+        });
         it('initialize and destroy must be called on flow entry and exit', function (done) {
             var counter = 0;
             var deinitCounter = 0;

@@ -1,0 +1,8 @@
+state.type = begin
+state.action = '@simple.flow'
+state.done -> end
+end.type = end
+end.action {
+    this.emit('hello');
+}
+end.hello -> done

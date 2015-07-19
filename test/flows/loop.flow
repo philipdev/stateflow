@@ -1,0 +1,26 @@
+begin.type = begin
+begin.action {
+    this.emit('next');
+}
+begin.next -> next
+next.action {
+    this.onStateActive('emitter', 'someEvent', function() {});
+    if(typeof this.count === 'undefined') {
+        this.count = 1;
+    } else {
+        this.count +=1;
+    }
+    console.error('loop, count:', this.count);
+
+    if(this.count == 10) {
+        this.installTimeout(10, 'end');
+    } else {
+        this.emit('loop');
+    }
+}
+next.loop -> next
+next.end -> end
+
+
+end -> ended // should this be an end action?
+end.type = end
