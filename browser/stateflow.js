@@ -1514,14 +1514,6 @@ function State(config, name, parent) {
         this.cancelTimeout();
     });
 
-    if(parent) {
-        parent.once('flow:exit', function() {
-            self.flowActiveListeners.forEach( function(config) {
-                removeEventListener(config.source, config.event, config.listener);
-            });
-            self.flowActiveListeners = [];
-        });
-    }
 
     this.timeout = 0;
     this.listeners = [];
@@ -1534,6 +1526,13 @@ util.inherits(State, EventEmitter);
  * Get an object value from the current state or it's parents.
  * @param name {string} the object name
  */
+State.prototype._removeActiveFlowListeners = function() {
+    this.flowActiveListeners.forEach( function(config) {
+        removeEventListener(config.source, config.event, config.listener);
+    });
+    this.flowActiveListeners = [];
+};
+
 State.prototype.get = function (name) {
     var value;
     if (this.data[name]) {
@@ -1572,7 +1571,9 @@ State.prototype.createListenerConfig = function(objectOrName, event, listener) {
         };
     } else if (typeof listener === 'string') { // listener is a string complete event
         listenerConfig.listener = function () {
-            self.stateComplete(listener);
+            var args = [listener];
+            args.push.apply(args, arguments);
+            self.emit.apply(self, args);
         };
     } else {
         listenerConfig.listener = function () {
@@ -1827,6 +1828,8 @@ StateFlow.prototype.initializeState = function(state) {
 StateFlow.prototype.destroyState = function(state) {
     var stateObject = this.getStateObject(state);
 
+    stateObject._removeActiveFlowListeners(); // avoid extra event listener
+
     if(typeof this.config[state].destroy === 'function') {
         this.config[state].destroy.call(stateObject);
     }  else if(typeof state.action ==='string') {
@@ -1835,7 +1838,7 @@ StateFlow.prototype.destroyState = function(state) {
         }
     }
 
-    delete this.states[state];
+    this.states[state] = undefined;
 };
 
 /**
@@ -1885,7 +1888,7 @@ StateFlow.prototype.createSubFlowAction = function () {
  * Start the flow with the state of type 'begin' 
  * @param complete {completion} callback to be called when the end state has been reached.
  */
-StateFlow.prototype.start = function (complete, subflow) {
+StateFlow.prototype.start = function (complete) {
     var self = this, states = this.findStatesByType('begin');
 
     if (states.length === 0) {
@@ -1894,12 +1897,15 @@ StateFlow.prototype.start = function (complete, subflow) {
     if (states.length > 1) {
         throw new Error('Too many begin states found!');
     }
-    this.emit('flow:entry'); // TODO: flow:
+    this.emit('flow:entry'); // states just emit entry and exit maybe a flow should also (but only if it is a root flow).
 
     this.stateComplete = function(event) {
-        self.emit('flow:exit', event); // TODO: flow:
-        if( typeof complete === 'function') {
-            complete(event);
+        try {
+            if (typeof complete === 'function') {
+                complete.call(self, event);
+            }
+        } finally {
+            self.emit('flow:exit', event); // let give the flow callback a change to peek into the flow
         }
     };
 
@@ -1957,42 +1963,44 @@ StateFlow.prototype.go = function (state, complete) {
      * @event module:stateflow.event:entry
      */
     stateObj.emit('entry', state);
+
     /**
      * Event fired when a specific stateName state has been reached, if new listener is added with an state:stateName which is already
      * current then the event will also be fired (stateName must must be replaced with an actual state).
      * @event state:stateName
      */
-    this.emit('state:' + state);
+    this.emit('state:' + state, stateObj);
+
+    try {
+       if(action !== undefined) {
+           action.call(stateObj, stateObj.stateComplete);
+       } else  {
+           stateObj.stateComplete();
+       }
+    } catch(e) {
+        var errorHandled = false;
+        if(typeof e ==='object' && typeof e.code === 'string' ) {
+            errorHandled = stateObj.emit(e.code);
+            //console.log('error in state', state, e); // otherwize: error information lost!
+        }
+
+        if(!errorHandled) {
+            //console.log('error in state', state, e);
+            errorHandled = stateObj.emit('error', e);
+        }
+        if(!errorHandled) {
+            this.emit('error', e);
+        }
+
+    }
+
     /**
      * Emitted for every state change,
      * @param state {string} new state
      * @param oldState {string} previous state
      * @event stateChanged
      */
-    this.emit('stateChanged', state, oldState);
-
-    try {
-       if(action !== undefined) {
-           action.call(stateObj, stateObj.stateComplete);
-       } else if(stateDefinition.type === 'end') {
-           stateObj.stateComplete('end');
-       }
-    } catch(e) {
-        var errorHandled = false;
-        if(typeof e ==='object' && typeof e.code === 'string' ) {
-            errorHandled = stateObj.stateComplete(e.code);
-            //console.log('error in state', state, e); // otherwize: error information lost!
-        }
-        if(!errorHandled) {
-            errorHandled = stateObj.stateComplete('exception');
-            //console.log('error in state', state, e); // otherwize: error information lost!
-        }
-
-        if(!errorHandled) {
-            //console.log('error in state', state, e);
-            this.emit('error', e);
-        }
-    }
+    this.emit('stateChanged', state, oldState, stateObj);
 
 };
 
@@ -2001,8 +2009,6 @@ StateFlow.prototype.forwardEvents = function (stateObject, on, complete) {
     if (typeof on === 'object') {
         forwardEvents = Object.keys(on);
     }
-
-
 
     forwardEvents.forEach(function (key) {
         var serviceAndEvent;
@@ -2018,7 +2024,8 @@ StateFlow.prototype.forwardEvents = function (stateObject, on, complete) {
             this.stateComplete(key); // when the service.event appears, emit it agian as service.event event!
         });
     }, this);
-    if ( EventEmitter.listenerCount(stateObject, 'event') === 0 && stateObject.parent ) {
+
+    if ( EventEmitter.listenerCount(stateObject, 'error') === 0 && stateObject.parent ) {
         // Forward errors to the parent
         // TODO: TEST THIS, NOTE COULD ALSO DOMAIN FOR THIS
         // NOTE: this will only catch error while the state is active, not if some delayed callback of a finished state comes back with an error
@@ -2026,6 +2033,7 @@ StateFlow.prototype.forwardEvents = function (stateObject, on, complete) {
             stateObject.parent.emit('error', e, stateObject);
         });
     }
+
 };
 
 /**
@@ -2076,7 +2084,10 @@ StateFlow.prototype.createStateHandler = function (state, stateObj, flowComplete
                 targetState = stateDefinition.on[event];
             } else if (typeof stateDefinition.on === 'object' && stateDefinition.on['*']) { // thinking of removing wildcard matches, since EventEmitter doesn't have a catch all
                 targetState = stateDefinition.on['*'];
+            } else if (typeof stateDefinition.on === 'object' && stateDefinition.on['']) {
+                targetState = stateDefinition.on['']; // state complete is called directly when no action is defined, if there is also an empty handler (state -> next) then this will match
             }
+
             if (targetState) {
                 exitFunction();
                 self.go(targetState, flowCompleted);

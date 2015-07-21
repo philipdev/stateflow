@@ -19,7 +19,10 @@ describe('StateFlow', function () {
             },
             nextState: {
                 type: 'end',
-                action: 'endAction'
+                action: 'endAction',
+                on :{
+                    'end':'end'
+                }
             }
         };
 
@@ -39,7 +42,9 @@ describe('StateFlow', function () {
             flow.registerAction('endAction', function () {
                 this.stateComplete('done');
             });
-            flow.on('state:beginState', done);
+            flow.on('state:beginState', function() {
+                done();
+            });
             flow.start(function (event) {
                 assert.equal('done', event);
             });
@@ -50,7 +55,9 @@ describe('StateFlow', function () {
             flow.registerAction('endAction', function () {
                 this.stateComplete('done');
             });
-            flow.on('state:nextState', done);
+            flow.on('state:nextState', function(){
+                done();
+            });
             flow.start(function (event) {
                 assert.equal('done', event);
             });
@@ -151,10 +158,10 @@ describe('StateFlow', function () {
                         emitter.emit('nextEvent');
                     });
                 });
-                this.onStateActive('emitter', 'nextEvent', 'ended'); // completion event listener
+                this.onStateActive('emitter', 'nextEvent', 'end');
             });
             flow.start(function (event) {
-                assert.equal('ended', event);
+                assert.equal('end', event);
             });
 
             emitter.on('removeListener', function (event) {
@@ -252,9 +259,11 @@ describe('StateFlow', function () {
             flow.set('service', emitter);
 
             flow.start(function () {
-                assert.equal(counter, 1);
-                assert.equal(deinitCounter, 1);
-                done();
+                assert.equal(counter, 1, 'init not ok');
+                process.nextTick(function() {
+                    assert.equal(deinitCounter, 1, 'destroy not ok');
+                    done();
+                });
             });
         });
 

@@ -1,4 +1,5 @@
 start.type = begin
-start.'service.next' -> end
+start.'service.next' -> next
+next -> end
 end.type = end
 end -> finish

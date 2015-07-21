@@ -7,20 +7,16 @@ exception.action {
     // emits an error on the currentState and stays there
     //console.log('throw error');
     throw new Error('error in flow');
-
 }
 
-exception.exception -> myError
+exception.error -> noHandler
 
-myError.action {
-    var error = new Error('error');
-    error.code = 'myError'
-    throw error;
+
+noHandler.action {
+    throw new Error('error no handler');
 }
 
-myError.myError -> generic
-generic.action {
-    throw new Error('catch all handler');
-}
-generic.* -> end
+noHandler.'extern.next' -> end
+
 end.type = end
+end -> end

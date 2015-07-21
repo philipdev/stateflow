@@ -39,7 +39,7 @@ describe('StateFlow special cases', function () {
 
                     try {
                         assert.equal('ended', event);
-                        assert.equal(10, this.states['next'].count);
+                        assert.equal(10, this.states.next.count);
                         //assert.equal(flow.getStateObject('loop').count);
                         done();
                     } catch(e) {

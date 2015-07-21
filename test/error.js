@@ -15,17 +15,28 @@ describe('error handling', function () {
     it('exception in action without handler, must stay current', function(done) {
         var flow = create('error.flow');
         flow.on('error', function(error) {
-            assert.equal(flow.currentState, 'next');
-            assert.equal(error.message, 'error in flow');
+            it('error must stay current', function(){
+                assert.equal(error.message, 'error in flow');
+                assert.equal(flow.currentState, 'next');
+            });
             done();
         });
-        flow.start(function(event) {});
+        flow.start();
 
     });
+
     it('exception in action with handler, must advance', function(done) {
         var flow = create('errorWithHandler.flow');
-        flow.start(function(event) {
+        flow.set('extern', new EventEmitter());
+        var errorHandled = false;
+        flow.on('error', function (e) {
+            assert.equal(e.message, 'error no handler');
+            flow.get('extern').emit('next');
             done();
         });
+
+
+        flow.start();
+        // flow.destroy();
     });
 });
