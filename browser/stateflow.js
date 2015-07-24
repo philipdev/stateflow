@@ -63,7 +63,7 @@ module.exports = (function() {
             var args = [];
             if(firstArg) {
                 args.push(firstArg);
-                console.log(restArgs);
+
                 if(restArgs) {
                     args.push.apply(args, restArgs);
                 }
@@ -76,7 +76,7 @@ module.exports = (function() {
         peg$c19 = ")",
         peg$c20 = { type: "literal", value: ")", description: "\")\"" },
         peg$c21 = function(args) {
-            console.log('FUNKY ARGS:', args);
+
             return args;
         },
         peg$c22 = function(state, property, argsNames, functionBody) {
@@ -99,7 +99,7 @@ module.exports = (function() {
         		},pre);
         	}
 
-        	//console.log(statements);
+
         	return '{' + join(statements, '') + '}';
         },
         peg$c30 = "[",

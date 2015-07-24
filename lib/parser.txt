@@ -31,7 +31,7 @@ funcArg =  firstArg:(jsArg) restArgs:(nextArg)*  {
     var args = [];
     if(firstArg) {
         args.push(firstArg);
-        console.log(restArgs);
+
         if(restArgs) {
             args.push.apply(args, restArgs);
         }
@@ -40,7 +40,7 @@ funcArg =  firstArg:(jsArg) restArgs:(nextArg)*  {
 }
 
 funcArgs = whitespace '(' whitespace args:(funcArg)? whitespace ')' whitespace{
-    console.log('FUNKY ARGS:', args);
+
     return args;
 }
 
@@ -64,7 +64,7 @@ block = ( '{' statements: ( block / [^{}]+ )* '}' ) {
 		},pre);
 	}
 
-	//console.log(statements);
+
 	return '{' + join(statements, '') + '}';
 }
 
