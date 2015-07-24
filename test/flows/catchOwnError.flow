@@ -1,0 +1,17 @@
+start.type = begin
+start -> catchOwn
+
+
+catchOwn.action {
+
+    this.onStateActive(this,'error', function(e) {
+        console.log('NEXXXXXXXXT');
+        this.emit('next');
+    });
+    throw new Error('error no handler');
+}
+
+catchOwn.next -> end
+
+end.type = end
+end -> end

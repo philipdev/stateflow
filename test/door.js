@@ -196,10 +196,18 @@ describe('Door', function () {
             door.on('locking', logStatus);
             
             var flow = new StateFlow(openDoorDef);
+            flow.on('error', console.log);
             flow.set('door',door);
-            flow.start(function (event) {
-                assert.equal('doorOpen', event);
-                done();
+            flow.start(function (event,error) {
+                try {
+                    assert.equal(event, 'doorOpen');
+                    if(error) {
+                        console.log(error);
+                    }
+                    done();
+                } catch(e) {
+                    done(e);
+                }
             });
         });
         

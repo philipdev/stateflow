@@ -1,7 +1,7 @@
 // Example of the simple flow language
 
 init.type = begin
-init.action { // check if a can make an action optional
+init.action(xx) { // check if a can make an action optional
     this.get('myService').emit('ready');
    // this.emit('ready');
 }
@@ -14,14 +14,14 @@ next.action {
 }
 next.next -> timeout
 
-timeout.action {
+timeout.action() {
     this.installTimeout(100, 'next');
 }
 
 timeout.* -> end
 
 
-end.action {
+end.action(a,b,c) {
    // console.log('finish');
     this.stateComplete('finish');
 }

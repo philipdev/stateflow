@@ -1,22 +1,21 @@
 start.type = begin
-start.action {
-    this.emit('next');
-}
-start.next -> exception
-exception.action {
+start -> next
+next.action {
     // emits an error on the currentState and stays there
     //console.log('throw error');
     throw new Error('error in flow');
 }
+next.error -> second
 
-exception.error -> noHandler
-
-
-noHandler.action {
-    throw new Error('error no handler');
+second.action {
+    this.installTimeout(10, function() {
+        this.emit('timeout');
+    });
+    this.onStateActive(this,'timeout', function() {
+        throw new Error('Error in timeout handler');
+    });
 }
-
-noHandler.'extern.next' -> end
+second.error -> end
 
 end.type = end
 end -> end

@@ -19,8 +19,34 @@ property = whitespace state:name whitespace property:(propertyNameLiteral / prop
    return {type:'property', state: state, property:property, value: value};
 }
 
-functionProperty = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup ) functionBody: funcBlock terminator {
-    return {type:'function', state: state, property:property, body: functionBody};
+jsArg = v:[$a-zA-Z0-9_]+ {
+    return v.join('');
+}
+
+nextArg = whitespace ',' whitespace arg:(jsArg) whitespace {
+    return arg;
+}
+
+funcArg =  firstArg:(jsArg) restArgs:(nextArg)*  {
+    var args = [];
+    if(firstArg) {
+        args.push(firstArg);
+        console.log(restArgs);
+        if(restArgs) {
+            args.push.apply(args, restArgs);
+        }
+    }
+    return args;
+}
+
+funcArgs = whitespace '(' whitespace args:(funcArg)? whitespace ')' whitespace{
+    console.log('FUNKY ARGS:', args);
+    return args;
+}
+
+
+functionProperty = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup )  argsNames:(funcArgs)?  functionBody: funcBlock terminator {
+    return {type:'function', state: state, property:property, body: functionBody, argsNames:argsNames};
 }
 
 

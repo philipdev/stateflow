@@ -1,0 +1,19 @@
+begin.type = begin
+begin -> first
+first.action ( a ) {
+    a.emit('next')
+}
+first.'a.next' -> second
+
+second.action(a, b) {
+    a.emit('other');
+    b.emit('bla');
+}
+second.'b.bla' -> third
+third.action () {
+    this.emit('next');
+}
+third.next -> end
+
+end.type = end
+end -> end

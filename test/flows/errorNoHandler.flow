@@ -1,0 +1,15 @@
+start.type = begin
+start.action {
+    this.emit('next');
+}
+start.next -> noHandler
+
+
+noHandler.action {
+    throw new Error('error no handler');
+}
+
+noHandler.'extern.next' -> end
+
+end.type = end
+end -> end

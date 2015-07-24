@@ -62,9 +62,9 @@ If defined by flow definition then start and end of the flow will be mapped to t
 
 | Name | Type | Description |
 | --- | --- | --- |
-| active | <code>boolean</code> | is true when the state is the current state (initial false offcourse). |
+| active | <code>boolean</code> | is true when the state is the current state (initial false ofcourse). |
 | parent | <code>StateFlow</code> &#124; <code>undefined</code> | only set on subflows and regular states. |
-| config | <code>[stateDefinition](#stateDefinition)</code> | state defintion |
+| config | <code>[stateDefinition](#stateDefinition)</code> | state definition |
 
 
 * [State](#State)
@@ -172,7 +172,7 @@ Load a flow and it's subflows
 | Param | Description |
 | --- | --- |
 | resource | the name of the flow to load |
-| loader | the loader which actually loads the name as a string, has to paramers the resource to load and the callback, the first argument is error or undefined and the second is the source string |
+| loader | the loader which actually loads the name as a string, has to parameters the resource to load and the callback, the first argument is error or undefined and the second is the source string |
 | cb |  |
 
 <a name="state_stateName"></a>
@@ -199,7 +199,7 @@ Emitted for every state change,
 | Name | Type | Description |
 | --- | --- | --- |
 | type | <code>string</code> | 'begin': initial state on flow start, 'state': normal state (default), 'end': flow terminates when this state |
-| action | <code>[action](#action)</code> | executed when the state becomes active, defined a function, action name to use a registered action or subflow object flow defintion. |
+| action | <code>[action](#action)</code> | executed when the state becomes active, defined a function, action name to use a registered action or subflow object flow definition. |
 | initialize | <code>function</code> | is called when the flow starts. |
 | destroy | <code>function</code> | is called when the flow exits. |
 | on | <code>object</code> | key is state completion event value is the next state to goto. 'objectName.eventName' is also supported, aka if this.get('objectName') emits eventName then goto the next state . |
