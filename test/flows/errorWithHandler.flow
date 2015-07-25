@@ -12,7 +12,7 @@ second.action {
         this.emit('timeout');
     });
     this.onStateActive(this,'timeout', function() {
-        throw new Error('Error in timeout handler');
+        throw new Error('Error in event handler');
     });
 }
 second.error -> end

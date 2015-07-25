@@ -5,7 +5,7 @@ first.action ( a ) {
 }
 first.'a.next' -> second
 
-second.action(a, b) {
+second.action (a, b) {
     a.emit('other');
     b.emit('bla');
 }
@@ -13,7 +13,7 @@ second.'b.bla' -> third
 third.action () {
     this.emit('next');
 }
-third.next -> end
 
+third.next -> end
 end.type = end
 end -> end

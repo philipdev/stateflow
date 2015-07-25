@@ -147,7 +147,7 @@ describe('StateFlow', function () {
             }, 250);
         });
 
-        it('onStateActive, listens only when active, completion event when listener is a string', function (done) {
+        it('onStateActive, listens only when active, state event when listener is a string', function (done) {
             var flow = new StateFlow(flowDefinition), emitter = new EventEmitter();
 
             flow.set('emitter', emitter);

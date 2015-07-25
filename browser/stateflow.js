@@ -89,7 +89,7 @@ module.exports = (function() {
         peg$c27 = "}",
         peg$c28 = { type: "literal", value: "}", description: "\"}\"" },
         peg$c29 = function(statements) {
-        	function join(array,pre) {
+        	function join(array, pre) {
         		return array.reduce(function(prev, current) {
         			if(current instanceof Array) {
         				return join(current, prev);
@@ -1594,13 +1594,17 @@ var parse = function(src, ref) { // we might need caching
 
                 var state = getState(obj, row.state);
                 var funcArgs = ['complete']; // TODO: REMOVE THIS CALLBACK!!!
-                if(row.argsNames) {
+                if(row.argsNames && row.property === 'action') {
                     state.argumentNames = row.argsNames;
                     funcArgs.push.apply(funcArgs, state.argumentNames);
                 }
+                try {
+                    // first and last character are removed, because we dont want the outer '{' '}', need to fix this in the parser
+                    state[row.property] = new Function(funcArgs, row.body.slice(1,-1) + '\n' + sourceURL);
 
-                state[row.property] = new Function(funcArgs, row.body + '\n' + sourceURL);
-
+                } catch(e) {
+                    console.log(e.stack, ref, row.body);
+                }
             }
         });
 
@@ -1640,7 +1644,7 @@ var load = function(resource, loader, cb) {
                     lineNo = 'unknown';
                     line = '';
                 }
-                
+                console.log(e);
                 throw new Error('parse error in ' + resource + ' at line ' + lineNo + ' : ' + line );
             }
             var remaining = Object.keys(flowConfig).filter(function (stateName) {

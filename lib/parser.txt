@@ -52,9 +52,8 @@ functionProperty = whitespace state:name whitespace property:(propertyNameLitera
 
 funcBlock = block
 
-
 block = ( '{' statements: ( block / [^{}]+ )* '}' ) {
-	function join(array,pre) {
+	function join(array, pre) {
 		return array.reduce(function(prev, current) {
 			if(current instanceof Array) {
 				return join(current, prev);

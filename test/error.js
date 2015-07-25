@@ -56,15 +56,16 @@ describe('error handling', function () {
     });
 
     it('error:  no handler, no listener  must exit with error', function(done) {
-        var flow = create('errorNoHandler.flow');
+        var flow = create('errorNoHandler.flow'), exitEvent = false;
         flow.addStateDecorator(function(state) {
             if(state.name === 'noHandler') {
                 console.log('adding noHandler exit event handler');
-                state.on('exit', function(target, event, error){
+                state.on('exit', function(target, event, args){
                      try {
-                         console.log('exit event called!');
                          assert.equal(event, 'error');
-                         assert.equal(error[0].message, 'error no handler');
+                         assert.equal(args.length,  1, 'exit event error must have one argument');
+                         assert.equal(args[0].message, 'error no handler','the argument must be the error thrown');
+                         exitEvent = true;
                      } catch(e) {
                          done(e);
                     }
@@ -74,6 +75,7 @@ describe('error handling', function () {
         flow.start(
             function(event, error) {
                 try {
+                    assert(exitEvent, 'exit event must always fired!');
                     assert.equal(event, 'error');
                     assert.equal(error.message, 'error no handler');
                     done();

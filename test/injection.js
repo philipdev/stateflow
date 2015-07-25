@@ -18,11 +18,13 @@ var parser = require('../lib/parser');
 var stateflow = require('../lib/stateflow');
 var EventEmitter = require('events').EventEmitter;
 
+
+
 function create(path) {
     return stateflow.create(fs.readFileSync(__dirname +'/flows/' + path, 'utf8'));
 }
 
-describe('error handling', function () {
+describe('DI', function () {
 
     it('dependency injection ', function (done) {
         var flow = create('inject.flow');
@@ -30,8 +32,11 @@ describe('error handling', function () {
         flow.set('b', new EventEmitter());
         flow.set('c', new EventEmitter());
 
-        flow.start(function (event) {
+        flow.start(function (event, error) {
             try {
+                if(event === 'error') {
+                    assert.fail('Got error:' + error);
+                }
                 assert.equal(event, 'end');
                 done();
             } catch (e) {
