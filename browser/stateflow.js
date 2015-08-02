@@ -1558,7 +1558,6 @@ var peg = require('pegjs');
 var fs = require('fs');
 
 
-//var parser = peg.buildParser(fs.readFileSync(__dirname +"/parser.txt", "utf8"));
 var parser = require('./generatedParser.js'); // browserify friendly
 
 function getState(flow, name) {
@@ -1594,17 +1593,14 @@ var parse = function(src, ref) { // we might need caching
 
                 var state = getState(obj, row.state);
                 var funcArgs = ['complete']; // TODO: REMOVE THIS CALLBACK!!!
-                if(row.argsNames && row.property === 'action') {
-                    state.argumentNames = row.argsNames;
-                    funcArgs.push.apply(funcArgs, state.argumentNames);
+                if(row.argsNames) {
+                    state [row.property  + 'ArgumentNames'] = row.argsNames;
+                    funcArgs.push.apply(funcArgs, row.argsNames);
                 }
-                try {
-                    // first and last character are removed, because we dont want the outer '{' '}', need to fix this in the parser
-                    state[row.property] = new Function(funcArgs, row.body.slice(1,-1) + '\n' + sourceURL);
 
-                } catch(e) {
-                    console.log(e.stack, ref, row.body);
-                }
+                // first and last character are removed, because we dont want the outer '{' '}', need to fix this in the parser
+                state[row.property] = new Function(funcArgs, row.body.slice(1, -1) + '\n' + sourceURL);
+
             }
         });
 
@@ -2235,8 +2231,8 @@ StateFlow.prototype.go = function (state, complete, event, args) {
     try {
        if(action !== undefined) {
            var actionArgs = [stateObj.stateComplete];
-           if(stateDefinition.argumentNames) {
-               stateDefinition.argumentNames.forEach(function(name) {
+           if(Array.isArray(stateDefinition.actionArgumentNames)) {
+               stateDefinition.actionArgumentNames.forEach(function(name) {
                    actionArgs.push(stateObj.get(name));
                });
            }
