@@ -31,9 +31,12 @@ function loader(resource, cb) {
 	});
 }
 var stateflow = require('stateflow');
-var flow = stateflow.load('myflow.flow', loader );
-flow.set('myService', service);
-flow.start();
+stateflow.load('myflow.flow', loader, function(error, flow) {
+	if(!error) {
+		flow.set('myService', service);
+		flow.start();
+	}
+});
 
 ```
 ## Example flow a -> b -> c
@@ -110,6 +113,14 @@ State function property is a statement defined in the format state.property { },
 The state and property have the same restrictions as a regular State property then curly brackets enclose a JavaScript function body and are generally used to implement state actions.
 ```
 	state.action {
+		this.emit('event');
+	}
+```
+
+Actions function can also be injected with one or more services (equivalent of flow.get('<SERVICE>') as named arguments.
+```
+	state.action(myService) { // service was set via flow.set('myService', service)
+		myService.someMethod();
 		this.emit('event');
 	}
 ```

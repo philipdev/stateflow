@@ -56,6 +56,14 @@ The state and property have the same restrictions as a regular State property th
 	}
 ```
 
+Actions function can also be injected with one or more services (equivalent of flow.get('<SERVICE>') as named arguments.
+```
+	state.action(myService) { // service was set via flow.set('myService', service)
+		myService.someMethod();
+		this.emit('event');
+	}
+```
+
 A literal string is string without quotes out following characters of 0-9, a-Z, @, -, _  
 
 A literal number a number can have any digit, minus sign and a dot (.)

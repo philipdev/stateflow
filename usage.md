@@ -7,9 +7,12 @@ function loader(resource, cb) {
 	});
 }
 var stateflow = require('stateflow');
-var flow = stateflow.load('myflow.flow', loader );
-flow.set('myService', service);
-flow.start();
+stateflow.load('myflow.flow', loader, function(error, flow) {
+	if(!error) {
+		flow.set('myService', service);
+		flow.start();
+	}
+});
 
 ```
 ## Example flow a -> b -> c
