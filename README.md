@@ -117,7 +117,7 @@ The state and property have the same restrictions as a regular State property th
 	}
 ```
 
-Actions function can also be injected with one or more services (equivalent of flow.get('<SERVICE>') as named arguments.
+Actions function can be injected with one or more services (equivalent of flow.get('<SERVICE>') as named arguments.
 ```
 	state.action(myService) { // service was set via flow.set('myService', service)
 		myService.someMethod();

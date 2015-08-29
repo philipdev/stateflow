@@ -1,6 +1,6 @@
 {
   "name": "stateflow",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "event driven async flow engine",
   "main": "./lib/stateflow.js",
   "private": false,
