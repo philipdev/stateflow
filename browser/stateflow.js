@@ -345,9 +345,9 @@ module.exports = (function() {
         if (s1 === peg$FAILED) {
           s1 = peg$parseproperty();
           if (s1 === peg$FAILED) {
-            s1 = peg$parseevent();
+            s1 = peg$parsedirectEvent();
             if (s1 === peg$FAILED) {
-              s1 = peg$parsedirectEvent();
+              s1 = peg$parseevent();
               if (s1 === peg$FAILED) {
                 s1 = peg$parseignoreSpace();
               }
@@ -363,9 +363,9 @@ module.exports = (function() {
           if (s1 === peg$FAILED) {
             s1 = peg$parseproperty();
             if (s1 === peg$FAILED) {
-              s1 = peg$parseevent();
+              s1 = peg$parsedirectEvent();
               if (s1 === peg$FAILED) {
-                s1 = peg$parsedirectEvent();
+                s1 = peg$parseevent();
                 if (s1 === peg$FAILED) {
                   s1 = peg$parseignoreSpace();
                 }

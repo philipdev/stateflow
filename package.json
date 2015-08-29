@@ -1,6 +1,6 @@
 {
   "name": "stateflow",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "event driven async flow engine",
   "main": "./lib/stateflow.js",
   "private": false,
@@ -31,9 +31,10 @@
     "grunt-mocha-test": "*",
     "grunt-peg": "^1.5.0",
     "grunt-text-replace": "^0.4.0",
-    "mocha": "^2.1.0"
+    "mocha": "^2.1.0",
+	"pegjs": "^0.8.0"
   },
   "dependencies": {
-    "pegjs": "^0.8.0"
+    
   }
 }

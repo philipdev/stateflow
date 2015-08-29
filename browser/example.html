@@ -1,39 +1,52 @@
 <html>
-	<head>
-		<script type="text/javascript" src="stateflow.js" >
-		</script>
-		<script type="text/template" id="flowScript">
-			begin.type = begin
-			begin.action {
-				this.emit('next');
-			}
-			begin.next -> stop
-			
-			stop.action {
-				this.get('button').innerHTML = "start";
-			}			
-			stop.'button.click' -> start
-			start.action {
-				this.get('button').innerHTML = "stop";
-			}
-			start.'button.click' -> stop
+    <head>
+        <script type="text/javascript" src="stateflow.js" >
+        </script>
+    </head>
+    <body>
+<h1>Counting button example: <button id="myButton" style="style:padding:5px; font-size:30px">start</button></h1>
+<H2>Script</H2>
+<pre id="jsscriptoutput">
+</pre> 
+ 
+<H2>Flow</H2>
+<pre type="text/template" id="flowScript">
+begin.type = begin
+begin.action (button) {
+    this.parent.count = 0;
+    button.innerHTML = "start counting";
+    button.style.background= 'gray';
+}           
+begin.'button.click'->count
 
-		</script>
-		
-		
-	</head>
-	<body>
-		<button id="myButton">start</button>
-		<script type="text/javascript">
-		console.log(document.getElementById('flowScript').innerHTML);
-		var flow = stateflow.create(document.getElementById('flowScript').innerHTML);
-		
-		var button = document.getElementById('myButton')
-		flow.set('button', button);
-		
-		flow.start( function(event) {
-			console.log('flow:', event);
-		});
-		</script>
-	</body>
+count.action (button) {
+    this.parent.count++;
+    if(this.parent.count > 5) {
+        this.emit('maxReached');
+    } else {
+        button.innerHTML = "count: " + this.parent.count ;
+        button.style.background= 'red';
+    }
+}
+count.'button.blur' -> begin
+count.'button.click' -> count
+count.maxReached -> finish
+
+finish.action(button) {
+    button.innerHTML = "finished!";
+    button.style.background= 'green';
+    this.parent.count = 0;
+}
+finish.'button.click'-> count
+</pre>      
+    
+<script type="text/javascript" id="jsscript">
+var flow = stateflow.create(document.getElementById('flowScript').innerText);
+flow.set('button', document.getElementById('myButton'));
+flow.start();
+</script>
+        <script type="text/javascript">
+            document.getElementById('jsscriptoutput').innerHTML = document.getElementById('jsscript').innerText;
+        </script>
+    </body>
 </html>

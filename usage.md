@@ -1,45 +1,32 @@
 # Example
 ## Javascript
 ```
+function loader(resource, cb) {
+	fs.readFile(resource,'utf8', function(err, contents) {
+		cb(err, contents);
+	});
+}
 var stateflow = require('stateflow');
-var flow = stateflow.create(fs.readFileSync('myflow.txt','utf8'));
-
+var flow = stateflow.load('myflow.flow', loader );
 flow.set('myService', service);
-flow.registerAction('namedAction', func);
-
-flow.start(function(event) {
-	console.log('flow ended with:', event);
-});
+flow.start();
 
 ```
 ## Example flow a -> b -> c
 ```
 a.type = begin
-a.action {
-	// regular js function body, where 'this' is the current State object
-	// only the global scope, you must use flow.set('name', obj); for external services
-	this.emit('ignore');
-	this.emit('next'); // first matched event finishes the current state
-	this.emit('next'); // ignored
+a.action(service) {
+	service.emit('event');
 }
-
-a.next -> b
-a.'service.event' -> b // does not exist in this example
+a.'service.event' -> b
 
 b.action {
 	this.installTimeout(100, 'mytimeout');
 }
-
 b.mytimeout -> c
-b.other -> a
 
 c.type = end
-c.action {
-	this.emit('finish');	
-}
-// event mapping on end stated is used to map to flow exit event
-c.finish -> finish 
-
+c -> finish 
 ```
 
 

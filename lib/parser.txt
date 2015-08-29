@@ -4,7 +4,7 @@
 {
 
 }
-start = (comment/functionProperty/property/event/directEvent/ignoreSpace)*
+start = (comment/functionProperty/property/directEvent/event/ignoreSpace)*
 
 directEvent = whitespace from:name whitespace '->' whitespace to:name  terminator {
     return {type:'event', from: from, to:to, on: ''};
@@ -45,7 +45,7 @@ funcArgs = whitespace '(' whitespace args:(funcArg)? whitespace ')' whitespace{
 }
 
 
-functionProperty = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup )  argsNames:(funcArgs)?  functionBody: funcBlock terminator {
+functionProperty = whitespace state:name whitespace property:(propertyNameLiteral / propertyNameLookup ) argsNames:(funcArgs)?  functionBody: funcBlock terminator {
     return {type:'function', state: state, property:property, body: functionBody, argsNames:argsNames};
 }
 
