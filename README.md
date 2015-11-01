@@ -1,4 +1,6 @@
 # Introduction
+
+[![Join the chat at https://gitter.im/philipdev/stateflow](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/philipdev/stateflow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A stateflow is a collection of steps which has to be executed in a controlled order.
 A step is defined as a state, a state has an action which is executed asynchronously.
 The next state to go is defined as an "on" mapping either by mapping a state action completion event triggered by an execution callback or
